@@ -216,6 +216,10 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px 60px}
 .chk-all:disabled{cursor:not-allowed;opacity:.5}
 /* locked per-kegiatan */
 .inp-locked{background:var(--teal-lt)!important;color:#0A6B48!important;border-color:var(--teal-mid)!important;font-weight:600}
+.btn-unlock-petak{font-size:9px;padding:2px 7px;border-radius:99px;border:1px solid var(--sand3);background:var(--sand2);color:var(--ink3);cursor:pointer;margin-left:4px;white-space:nowrap;vertical-align:middle}
+.btn-unlock-petak:hover{background:var(--amber-lt);color:var(--amber);border-color:var(--amber)}
+.autosave-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--teal);margin-left:4px;animation:pulse 1s ease-in-out infinite;vertical-align:middle}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
 
 @media(max-width:800px){
   .stat-grid{grid-template-columns:repeat(2,1fr)}
@@ -918,6 +922,7 @@ var selBulan=now.getMonth(),selMinggu=1,activeBlok=1;
 var state={entries:{}};
 var unlockedBloks=new Set();
 var manualLockedBloks=new Set(); // kunci manual per blok
+var unlockedPetaks=new Set();   // unlock per petak (override lock)
 var kegFilter="jalur";
 var statPeriod="tahun";
 var isAdmin=false;
@@ -1061,6 +1066,23 @@ function isBlokLocked(blokId){
   if(manualLockedBloks.has(blokId))return true;
   var blok=BLOK_DATA.find(function(b){return b.id===blokId});
   return blok.petak.every(function(p){return isPetakDone(p.id,p.target)});
+}
+
+// ── UNLOCK PER PETAK ─────────────────────────────────────────────
+function unlockPetak(pid){
+  unlockedPetaks.add(pid);
+  // Re-render hanya baris petak ini tanpa re-render seluruh tabel
+  renderInput(activeBlok);
+  // Auto-fokus ke input pertama petak ini
+  setTimeout(function(){
+    var inp=document.getElementById('jalur_'+pid);
+    if(inp&&!inp.disabled)inp.focus();
+  },50);
+}
+
+// Reset unlock petak setelah simpan berhasil
+function resetPetakUnlocks(){
+  unlockedPetaks.clear();
 }
 
 // ── KUNCI MANUAL ──────────────────────────────────────────────────
@@ -1237,6 +1259,7 @@ function renderInput(blokId){
     var e=getEntry(p.id,wk);
     var tot=getPetakTotals(p.id);
     var petakDone=isPetakDone(p.id,p.target);
+    var forceEdit=unlocked; // reset per petak
 
     // Carry-over: hanya jika minggu ini kosong DAN minggu ini lebih baru dari semua data DAN sudah done
     var hasThisWeek=Object.keys(e).length>0;
@@ -1255,11 +1278,17 @@ function renderInput(blokId){
     var tj=e.tglJalur||friStr,ts=e.tglSulam||friStr;
     var tsi=e.tglSiang||friStr,th=e.tglHama||friStr,tp=e.tglPupuk||friStr;
 
-    // Disabled: terkunci blok ATAU (petak done && tidak force edit)
-    var dis=((locked&&!forceEdit)||(petakDone&&!forceEdit))?' disabled="disabled"':"";
+    // Disabled: terkunci blok ATAU (petak done && tidak force edit && tidak unlock per petak)
+    var isPetakUnlocked2=unlockedPetaks.has(p.id);
+    var dis=((locked&&!forceEdit)||((petakDone&&!forceEdit&&!isPetakUnlocked2)))?' disabled="disabled"':"";
 
     var dotCol=petakDone?"#1D9E75":tot.jalur>0?"#C8762A":"#D8D3C5";
-    var nameLbl=p.nama+(petakDone?'<span class="done-cell" style="margin-left:4px;'+(forceEdit?'background:#FDF0DC;color:#8A4D0A':'')+'">100%'+(forceEdit?' (edit)':'')+'</span>':"");
+    var isPetakUnlocked=unlockedPetaks.has(p.id);
+    var showUnlockBtn=petakDone&&!forceEdit&&!isPetakUnlocked&&!(locked&&!forceEdit);
+    var nameLbl=p.nama
+      +(petakDone&&!isPetakUnlocked?'<span class="done-cell" style="margin-left:4px">100%</span>':'')
+      +(petakDone&&isPetakUnlocked?'<span class="done-cell" style="margin-left:4px;background:#FDF0DC;color:#8A4D0A">Edit</span>':'')
+      +(showUnlockBtn?'<button class="btn-unlock-petak" data-unlockpid="'+p.id+'" title="Klik untuk edit petak ini">Buka</button>':'');
     var carryBadge=isCarryOver?'<span style="font-size:9px;background:#E1F5EE;color:#0A6B48;padding:1px 5px;border-radius:99px;margin-left:3px">carry-over</span>':"";
 
     var onchange=' oninput="updateCalc()"';
@@ -1309,33 +1338,93 @@ function renderInput(blokId){
   });
   // Hitung kalkulator setelah render
   setTimeout(updateCalc,0);
+
+  // Restore _checkboxState ke DOM setelah re-render
+  setTimeout(function(){
+    Object.keys(_checkboxState).forEach(function(key){
+      var parts=key.split('-');
+      // key format: "pid-keg" tapi pid bisa mengandung '-' juga (e.g. "1-1")
+      // Cari keg dari akhir
+      var kegs=Object.keys(KEG_INPUT_ID);
+      var foundKeg=null, foundPid=null;
+      kegs.forEach(function(keg){
+        var suffix='-'+keg;
+        if(key.endsWith(suffix)){
+          foundKeg=keg;
+          foundPid=key.slice(0,key.length-suffix.length);
+        }
+      });
+      if(!foundPid||!foundKeg)return;
+      var inp=document.getElementById(KEG_INPUT_ID[foundKeg]+foundPid);
+      var chk=document.getElementById(KEG_CHK_ID[foundKeg]+foundPid);
+      if(inp&&!inp.disabled){
+        inp.value=_checkboxState[key];
+        inp.classList.add('inp-locked');
+      }
+      if(chk&&!chk.disabled) chk.checked=true;
+    });
+    updateCalc();
+  },10);
 }
 
 // ── CENTANG KEGIATAN (event delegation) ──────────────────────────
 var KEG_INPUT_ID={jalur:'jalur_',sulam:'sulam_',siang:'siang_',hama:'hama_',pupuk:'pupuk_'};
 var KEG_CHK_ID={jalur:'chkJ_',sulam:'chkS_',siang:'chkSi_',hama:'chkH_',pupuk:'chkP_'};
 
+// State sementara checkbox - PERSISTEN selama sesi
+var _checkboxState={};
+
 function checkKeg(pid, keg, target, checked){
   var inp=document.getElementById(KEG_INPUT_ID[keg]+pid);
   if(!inp)return;
+
+  var val=checked ? parseFloat(target).toFixed(0) : "";
+  inp.value=val;
+
   if(checked){
-    inp.value=parseFloat(target).toFixed(0); // bulat sesuai target
-    // Tandai dengan class tapi JANGAN disable - biarkan tetap bisa diedit
     inp.classList.add('inp-locked');
-    // Simpan ke state lokal langsung tanpa tunggu server
-    // supaya tidak hilang kalau renderInput dipanggil
-    _checkboxState[pid+'-'+keg]=parseFloat(target).toFixed(0);
+    _checkboxState[pid+'-'+keg]=val;
   } else {
-    inp.value="";
     inp.classList.remove('inp-locked');
     delete _checkboxState[pid+'-'+keg];
   }
+
+  // AUTO-SAVE ke localStorage LANGSUNG - tidak tunggu tombol simpan
+  _autoSavePetak(pid);
   updateAllPetakCheck(pid);
   updateCalc();
 }
 
-// State sementara untuk nilai checkbox (agar tidak reset saat updateCalc)
-var _checkboxState={};
+// Auto-save petak ke localStorage (tanpa push server)
+function _autoSavePetak(pid){
+  var wk=wkKey(selBulan,selMinggu);
+  var g=function(id){var el=document.getElementById(id);return el?el.value||"":"";};
+  var data={
+    tglJalur:g("tglJ_"+pid),  jalur:g("jalur_"+pid),
+    tglSulam:g("tglS_"+pid),  sulam:g("sulam_"+pid),
+    tglSiang:g("tglSi_"+pid), siang:g("siang_"+pid),
+    tglHama:g("tglH_"+pid),   hama:g("hama_"+pid),
+    tglPupuk:g("tglP_"+pid),  pupuk:g("pupuk_"+pid)
+  };
+  var has=Object.values(data).some(function(v){return v!==""});
+  if(has){
+    setEntry(pid,wk,data); // simpan ke localStorage
+    // Tampilkan indikator auto-save
+    var row=document.getElementById("row_"+pid);
+    if(row){
+      var dot=row.querySelector('.autosave-dot');
+      if(!dot){
+        var td=row.cells[0];
+        if(td){
+          dot=document.createElement('span');
+          dot.className='autosave-dot';
+          dot.title='Tersimpan lokal, klik Simpan untuk kirim ke server';
+          td.appendChild(dot);
+        }
+      }
+    }
+  }
+}
 
 function checkAllPetak(pid, target, checked){
   var kegs=Object.keys(KEG_INPUT_ID);
@@ -1368,16 +1457,20 @@ function checkAllKeg(keg, checked){
   blok.petak.forEach(function(p){updateAllPetakCheck(p.id);});
 }
 
-// Event delegation untuk checkbox di tabel petak
+// Event delegation untuk checkbox dan tombol unlock petak
 document.addEventListener('change',function(e){
   var el=e.target;
   if(el.classList.contains('chk-keg-item')){
-    var pid=el.dataset.pid, keg=el.dataset.keg, tgt=el.dataset.tgt;
-    checkKeg(pid,keg,parseFloat(tgt),el.checked);
+    checkKeg(el.dataset.pid,el.dataset.keg,parseFloat(el.dataset.tgt),el.checked);
   }
   if(el.classList.contains('chk-all-petak')){
-    var pid=el.dataset.pid, tgt=el.dataset.tgt;
-    checkAllPetak(pid,parseFloat(tgt),el.checked);
+    checkAllPetak(el.dataset.pid,parseFloat(el.dataset.tgt),el.checked);
+  }
+});
+document.addEventListener('click',function(e){
+  var el=e.target;
+  if(el.classList.contains('btn-unlock-petak')&&el.dataset.unlockpid){
+    unlockPetak(el.dataset.unlockpid);
   }
 });
 
@@ -1455,6 +1548,8 @@ async function saveWeek(){
   Promise.all(promises).then(function(results){
     var ok=results.filter(function(r){return r.status==="saved";}).length;
     if(unlockedBloks.has(activeBlok))unlockedBloks.delete(activeBlok);
+    resetPetakUnlocks();
+    _checkboxState={};
     setSyncStatus("ok", ok+"/"+pushList.length+" tersimpan ke server");
     msg.textContent="Tersimpan - "+wkLabel(selBulan,selMinggu)+" ("+ok+"/"+pushList.length+" petak ke server)";
     msg.style.color="var(--teal)";
