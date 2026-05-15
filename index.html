@@ -969,22 +969,27 @@ async function fetchFromSheets(){
   }catch(e){loadCache();setSyncStatus("offline","Offline - cache lokal");}
 }
 
+// Push SATU petak ke server
+function pushOneToSheets(petakId,wk,entry){
+  var params=new URLSearchParams({
+    action:"save",petakId:petakId,weekKey:wk,
+    tglJalur:entry.tglJalur||"",jalur:entry.jalur||"",
+    tglSulam:entry.tglSulam||"",sulam:entry.sulam||"",
+    tglSiang:entry.tglSiang||"",siang:entry.siang||"",
+    tglHama:entry.tglHama||"",hama:entry.hama||"",
+    tglPupuk:entry.tglPupuk||"",pupuk:entry.pupuk||""
+  });
+  return fetch(API_URL+"?"+params.toString())
+    .then(function(r){return r.json();})
+    .catch(function(){return {status:"error"};});
+}
+
+// Push semua petak PARALLEL (tidak satu per satu)
 async function pushToSheets(petakId,wk,entry){
   setSyncStatus("saving","Menyimpan...");
-  try{
-    var params=new URLSearchParams({
-      action:"save",petakId:petakId,weekKey:wk,
-      tglJalur:entry.tglJalur||"",jalur:entry.jalur||"",
-      tglSulam:entry.tglSulam||"",sulam:entry.sulam||"",
-      tglSiang:entry.tglSiang||"",siang:entry.siang||"",
-      tglHama:entry.tglHama||"",hama:entry.hama||"",
-      tglPupuk:entry.tglPupuk||"",pupuk:entry.pupuk||""
-    });
-    var res=await fetch(API_URL+"?"+params.toString());
-    var json=await res.json();
-    if(json.status==="saved"){setSyncStatus("ok","Tersimpan");}
-    else{setSyncStatus("error","Server: "+(json.message||"error"));}
-  }catch(e){setSyncStatus("offline","Tersimpan lokal saja");}
+  var result=await pushOneToSheets(petakId,wk,entry);
+  if(result.status==="saved"){setSyncStatus("ok","Tersimpan");}
+  else{setSyncStatus("offline","Tersimpan lokal");}
 }
 
 // ── HELPERS ───────────────────────────────────────────────────────
@@ -1288,17 +1293,23 @@ function checkKeg(pid, keg, target, checked){
   var inp=document.getElementById(KEG_INPUT_ID[keg]+pid);
   if(!inp)return;
   if(checked){
-    inp.value=parseFloat(target).toFixed(2);
-    inp.disabled=true;
+    inp.value=parseFloat(target).toFixed(0); // bulat sesuai target
+    // Tandai dengan class tapi JANGAN disable - biarkan tetap bisa diedit
     inp.classList.add('inp-locked');
+    // Simpan ke state lokal langsung tanpa tunggu server
+    // supaya tidak hilang kalau renderInput dipanggil
+    _checkboxState[pid+'-'+keg]=parseFloat(target).toFixed(0);
   } else {
     inp.value="";
-    inp.disabled=false;
     inp.classList.remove('inp-locked');
+    delete _checkboxState[pid+'-'+keg];
   }
   updateAllPetakCheck(pid);
   updateCalc();
 }
+
+// State sementara untuk nilai checkbox (agar tidak reset saat updateCalc)
+var _checkboxState={};
 
 function checkAllPetak(pid, target, checked){
   var kegs=Object.keys(KEG_INPUT_ID);
@@ -1361,8 +1372,18 @@ async function saveWeek(){
   blok.petak.forEach(function(p){
     var petakDone=isPetakDone(p.id,p.target);
     var isUnlocked=unlockedBloks.has(activeBlok);
-    // Skip petak yang done kecuali blok di-unlock
-    if(petakDone&&!isUnlocked)return;
+    // Skip petak yang done KECUALI ada nilai baru dari checkbox atau input manual
+    // Cek apakah ada nilai berbeda dari yang tersimpan
+    var g2=function(id){var el=document.getElementById(id);return el?el.value||"":"";};
+    var prevEntry=getEntry(p.id,wk);
+    var hasNewInput=(
+      g2("jalur_"+p.id)!==(prevEntry.jalur||"") ||
+      g2("sulam_"+p.id)!==(prevEntry.sulam||"") ||
+      g2("siang_"+p.id)!==(prevEntry.siang||"") ||
+      g2("hama_"+p.id) !==(prevEntry.hama ||"") ||
+      g2("pupuk_"+p.id)!==(prevEntry.pupuk||"")
+    );
+    if(petakDone&&!isUnlocked&&!hasNewInput)return;
 
     var g=function(id){var el=document.getElementById(id);return el?el.value||"":"";};
     var data={
@@ -1393,21 +1414,33 @@ async function saveWeek(){
     return;
   }
 
-  msg.textContent="Menyimpan "+pushList.length+" petak...";
-  renderBlokList();
+  // Simpan lokal DULU - langsung feedback tanpa tunggu server
+  msg.textContent="Disimpan (" + pushList.length + " petak) - mengirim ke server...";
+  msg.style.color="var(--amber)";
+  renderBlokList(); // Update sidebar saja, JANGAN renderInput
 
-  var ok=0;
-  for(var i=0;i<pushList.length;i++){
-    try{await pushToSheets(pushList[i].id,wk,pushList[i].data);ok++;}catch(ignore){}
-  }
+  // Push semua ke server secara PARALLEL (bukan serial)
+  setSyncStatus("saving","Mengirim "+pushList.length+" petak...");
+  var promises=pushList.map(function(item){
+    return pushOneToSheets(item.id,wk,item.data);
+  });
 
-  // Reset unlock setelah simpan
-  if(unlockedBloks.has(activeBlok))unlockedBloks.delete(activeBlok);
-
-  msg.textContent="Tersimpan - "+wkLabel(selBulan,selMinggu)+" ("+ok+"/"+pushList.length+" petak)";
-  setTimeout(function(){msg.textContent="";},5000);
-  renderBlokList();
-  renderInput(activeBlok);
+  // Tidak perlu await - biarkan jalan di background
+  Promise.all(promises).then(function(results){
+    var ok=results.filter(function(r){return r.status==="saved";}).length;
+    if(unlockedBloks.has(activeBlok))unlockedBloks.delete(activeBlok);
+    setSyncStatus("ok", ok+"/"+pushList.length+" tersimpan ke server");
+    msg.textContent="Tersimpan - "+wkLabel(selBulan,selMinggu)+" ("+ok+"/"+pushList.length+" petak ke server)";
+    msg.style.color="var(--teal)";
+    setTimeout(function(){msg.textContent="";msg.style.color="";},5000);
+    renderBlokList();
+    // Re-render input HANYA setelah server konfirmasi, dan hanya jika masih di blok yang sama
+  }).catch(function(){
+    setSyncStatus("offline","Tersimpan lokal - gagal kirim server");
+    msg.textContent="Tersimpan lokal (server tidak terjangkau)";
+    msg.style.color="var(--ink3)";
+    setTimeout(function(){msg.textContent="";msg.style.color="";},5000);
+  });
 }
 
 // ── KEGIATAN FILTER ───────────────────────────────────────────────
