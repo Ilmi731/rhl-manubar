@@ -332,7 +332,7 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px 60px}
       <div class="keg-tabs" id="kegTabs">
         <button class="keg-tab active" data-keg="jalur" onclick="setKegFilter('jalur',this)" style="background:#1D9E75;color:white;border-color:#1D9E75">Pembersihan Jalur</button>
         <button class="keg-tab" data-keg="sulam" onclick="setKegFilter('sulam',this)">Penyulaman</button>
-        <button class="keg-tab" data-keg="siang" onclick="setKegFilter('siang',this)">Penyiangan</button>
+        <button class="keg-tab" data-keg="siang" onclick="setKegFilter('siang',this)">Pendangiran & Penyiangan</button>
         <button class="keg-tab" data-keg="hama" onclick="setKegFilter('hama',this)">P. Hama</button>
         <button class="keg-tab" data-keg="pupuk" onclick="setKegFilter('pupuk',this)">Pemupukan</button>
       </div>
@@ -510,7 +510,7 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px 60px}
             <th rowspan="2">Blok / Petak</th><th rowspan="2">Target (ha)</th>
             <th colspan="2">Pembersihan Jalur</th>
             <th colspan="2">Penyulaman</th>
-            <th colspan="2">Penyiangan</th>
+            <th colspan="2">Pendangiran & Penyiangan</th>
             <th colspan="2">P. Hama</th>
             <th colspan="2">Pemupukan</th>
             <th rowspan="2">Status</th>
@@ -630,7 +630,7 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px 60px}
       <div class="keg-tabs" id="kegTabs">
         <button class="keg-tab active" data-keg="jalur" onclick="setKegFilter('jalur',this)" style="background:#1D9E75;color:white;border-color:#1D9E75">Pembersihan Jalur</button>
         <button class="keg-tab" data-keg="sulam" onclick="setKegFilter('sulam',this)">Penyulaman</button>
-        <button class="keg-tab" data-keg="siang" onclick="setKegFilter('siang',this)">Penyiangan</button>
+        <button class="keg-tab" data-keg="siang" onclick="setKegFilter('siang',this)">Pendangiran & Penyiangan</button>
         <button class="keg-tab" data-keg="hama" onclick="setKegFilter('hama',this)">P. Hama</button>
         <button class="keg-tab" data-keg="pupuk" onclick="setKegFilter('pupuk',this)">Pemupukan</button>
       </div>
@@ -773,7 +773,7 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px 60px}
                 <th>Petak</th><th>Target (ha)</th>
                 <th>Tgl Jalur</th><th>Jalur (ha)</th>
                 <th>Tgl Sulam</th><th>Sulam (ha)</th>
-                <th>Tgl Siang</th><th>Penyiangan (ha)</th>
+                <th>Tgl Siang</th><th>Pendangiran & Penyiangan (ha)</th>
                 <th>Tgl Hama</th><th>P. Hama (ha)</th>
                 <th>Tgl Pupuk</th><th>Pupuk (ha)</th>
                 <th>Status</th>
@@ -803,7 +803,7 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px 60px}
             <th rowspan="2">Blok / Petak</th><th rowspan="2">Target (ha)</th>
             <th colspan="2">Pembersihan Jalur</th>
             <th colspan="2">Penyulaman</th>
-            <th colspan="2">Penyiangan</th>
+            <th colspan="2">Pendangiran & Penyiangan</th>
             <th colspan="2">P. Hama</th>
             <th colspan="2">Pemupukan</th>
             <th rowspan="2">Status</th>
@@ -1568,7 +1568,7 @@ async function saveWeek(){
 var KEG_CFG={
   jalur:{lbl:"Pembersihan Jalur",col:"#1D9E75"},
   sulam:{lbl:"Penyulaman",col:"#378ADD"},
-  siang:{lbl:"Penyiangan",col:"#639922"},
+  siang:{lbl:"Pendangiran & Penyiangan",col:"#639922"},
   hama:{lbl:"P. Hama & Penyakit",col:"#EF9F27"},
   pupuk:{lbl:"Pemupukan",col:"#534AB7"}
 };
@@ -1646,7 +1646,7 @@ function renderStatDetail(){
   var kegs=[
     {k:"jalur",lbl:"Pembersihan Jalur",col:"#1D9E75"},
     {k:"sulam",lbl:"Penyulaman",col:"#378ADD"},
-    {k:"siang",lbl:"Penyiangan",col:"#639922"},
+    {k:"siang",lbl:"Pendangiran & Penyiangan",col:"#639922"},
     {k:"hama",lbl:"P. Hama",col:"#EF9F27"},
     {k:"pupuk",lbl:"Pemupukan",col:"#534AB7"}
   ];
