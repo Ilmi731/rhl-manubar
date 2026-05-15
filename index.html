@@ -208,6 +208,15 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px 60px}
 .modal-input{width:100%;padding:10px 12px;border-radius:8px;border:1.5px solid var(--sand3);font-size:14px;margin-bottom:8px;font-family:"DM Mono",monospace;background:var(--sand)}
 .modal-input:focus{outline:none;border-color:var(--teal)}
 
+/* CHECKBOX CENTANG */
+.chk-wrap{display:flex;align-items:center;justify-content:center;gap:0}
+.chk-keg{width:16px;height:16px;cursor:pointer;accent-color:var(--teal)}
+.chk-keg:disabled{cursor:not-allowed;opacity:.5}
+.chk-all{width:16px;height:16px;cursor:pointer;accent-color:var(--forest)}
+.chk-all:disabled{cursor:not-allowed;opacity:.5}
+/* locked per-kegiatan */
+.inp-locked{background:var(--teal-lt)!important;color:#0A6B48!important;border-color:var(--teal-mid)!important;font-weight:600}
+
 @media(max-width:800px){
   .stat-grid{grid-template-columns:repeat(2,1fr)}
   .detail-grid{grid-template-columns:repeat(2,1fr)}
@@ -460,12 +469,17 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px 60px}
             <thead>
               <tr>
                 <th>Petak</th><th>Target (ha)</th>
-                <th>Tgl Jalur</th><th>Jalur (ha)</th>
-                <th>Tgl Sulam</th><th>Sulam (ha)</th>
-                <th>Tgl Siang</th><th>Penyiangan (ha)</th>
-                <th>Tgl Hama</th><th>P. Hama (ha)</th>
-                <th>Tgl Pupuk</th><th>Pupuk (ha)</th>
-                <th>Status</th>
+                <th>Tgl Jalur</th>
+                <th><div style="display:flex;align-items:center;gap:4px">Jalur (ha)<input type="checkbox" class="chk-all" id="chkAllJalur" title="Centang semua jalur = target" onchange="checkAllKeg('jalur',this.checked)"></div></th>
+                <th>Tgl Sulam</th>
+                <th><div style="display:flex;align-items:center;gap:4px">Sulam (ha)<input type="checkbox" class="chk-all" id="chkAllSulam" title="Centang semua sulam = target" onchange="checkAllKeg('sulam',this.checked)"></div></th>
+                <th>Tgl Siang</th>
+                <th><div style="display:flex;align-items:center;gap:4px">Siang (ha)<input type="checkbox" class="chk-all" id="chkAllSiang" title="Centang semua siang = target" onchange="checkAllKeg('siang',this.checked)"></div></th>
+                <th>Tgl Hama</th>
+                <th><div style="display:flex;align-items:center;gap:4px">P. Hama (ha)<input type="checkbox" class="chk-all" id="chkAllHama" title="Centang semua hama = target" onchange="checkAllKeg('hama',this.checked)"></div></th>
+                <th>Tgl Pupuk</th>
+                <th><div style="display:flex;align-items:center;gap:4px">Pupuk (ha)<input type="checkbox" class="chk-all" id="chkAllPupuk" title="Centang semua pupuk = target" onchange="checkAllKeg('pupuk',this.checked)"></div></th>
+                <th>Semua</th>
               </tr>
             </thead>
             <tbody id="petakBody"></tbody>
@@ -1460,25 +1474,117 @@ function renderInput(blokId){
     var carryBadge=isCarryOver?'<span style="font-size:9px;background:#E1F5EE;color:#0A6B48;padding:1px 5px;border-radius:99px;margin-left:3px">carry-over</span>':"";
 
     var onchange=' oninput="updateCalc()"';
-    tbody.innerHTML+="<tr>"
+
+    // Cek apakah tiap kegiatan sudah >= target (untuk lock & centang)
+    var kDone={
+      jalur: parseFloat(vJalur||0)>=p.target*0.95,
+      sulam: parseFloat(vSulam||0)>=p.target*0.95,
+      siang: parseFloat(vSiang||0)>=p.target*0.95,
+      hama:  parseFloat(vHama||0) >=p.target*0.95,
+      pupuk: parseFloat(vPupuk||0)>=p.target*0.95
+    };
+
+    // Disabled per-kegiatan: done kegiatan itu DAN tidak forceEdit
+    function kDis(keg){ return (kDone[keg]&&!forceEdit&&!locked)?'disabled="disabled"':dis.trim(); }
+    function kClass(keg){ return kDone[keg]&&!forceEdit?' class="inp inp-sm inp-locked"':' class="inp inp-sm"'; }
+    function kChecked(keg){ return kDone[keg]?'checked':''; }
+    var allDone=kDone.jalur&&kDone.sulam&&kDone.siang&&kDone.hama&&kDone.pupuk;
+    var chkDis=(locked&&!forceEdit)?' disabled="disabled"':'';
+
+    tbody.innerHTML+="<tr id='row_"+p.id+"'>"
       +'<td><div class="petak-name">'+nameLbl+carryBadge+'</div></td>'
       +'<td><span class="mono">'+haNum(p.target)+' ha</span></td>'
-      +'<td><input class="inp inp-date" type="date" id="tglJ_'+p.id+'" value="'+tj+'"'+dis+'></td>'
-      +'<td><input class="inp inp-sm" type="number" step="0.1" min="0" id="jalur_'+p.id+'" value="'+vJalur+'"'+dis+onchange+' placeholder="0"></td>'
-      +'<td><input class="inp inp-date" type="date" id="tglS_'+p.id+'" value="'+ts+'"'+dis+'></td>'
-      +'<td><input class="inp inp-sm" type="number" step="0.1" min="0" id="sulam_'+p.id+'" value="'+vSulam+'"'+dis+onchange+' placeholder="0"></td>'
-      +'<td><input class="inp inp-date" type="date" id="tglSi_'+p.id+'" value="'+tsi+'"'+dis+'></td>'
-      +'<td><input class="inp inp-sm" type="number" step="0.1" min="0" id="siang_'+p.id+'" value="'+vSiang+'"'+dis+onchange+' placeholder="0"></td>'
-      +'<td><input class="inp inp-date" type="date" id="tglH_'+p.id+'" value="'+th+'"'+dis+'></td>'
-      +'<td><input class="inp inp-sm" type="number" step="0.1" min="0" id="hama_'+p.id+'" value="'+vHama+'"'+dis+onchange+' placeholder="0"></td>'
-      +'<td><input class="inp inp-date" type="date" id="tglP_'+p.id+'" value="'+tp+'"'+dis+'></td>'
-      +'<td><input class="inp inp-sm" type="number" step="0.1" min="0" id="pupuk_'+p.id+'" value="'+vPupuk+'"'+dis+onchange+' placeholder="0"></td>'
-      +'<td><span class="status-dot" style="background:'+dotCol+'"></span></td>'
+      // JALUR
+      +'<td><input class="inp inp-date" type="date" id="tglJ_'+p.id+'" value="'+tj+'" '+kDis('jalur')+'></td>'
+      +'<td style="white-space:nowrap"><input'+kClass('jalur')+' type="number" step="0.1" min="0" id="jalur_'+p.id+'" value="'+vJalur+'" '+kDis('jalur')+onchange+' placeholder="0">'
+      +'<input type="checkbox" class="chk-keg chk-keg-item" id="chkJ_'+p.id+'" data-pid="'+p.id+'" data-keg="jalur" data-tgt="'+p.target+'" '+kChecked('jalur')+' '+chkDis+' title="Isi jalur = target"></td>'
+      // SULAM
+      +'<td><input class="inp inp-date" type="date" id="tglS_'+p.id+'" value="'+ts+'" '+kDis('sulam')+'></td>'
+      +'<td style="white-space:nowrap"><input'+kClass('sulam')+' type="number" step="0.1" min="0" id="sulam_'+p.id+'" value="'+vSulam+'" '+kDis('sulam')+onchange+' placeholder="0">'
+      +'<input type="checkbox" class="chk-keg chk-keg-item" id="chkS_'+p.id+'" data-pid="'+p.id+'" data-keg="sulam" data-tgt="'+p.target+'" '+kChecked('sulam')+' '+chkDis+' title="Isi sulam = target"></td>'
+      // SIANG
+      +'<td><input class="inp inp-date" type="date" id="tglSi_'+p.id+'" value="'+tsi+'" '+kDis('siang')+'></td>'
+      +'<td style="white-space:nowrap"><input'+kClass('siang')+' type="number" step="0.1" min="0" id="siang_'+p.id+'" value="'+vSiang+'" '+kDis('siang')+onchange+' placeholder="0">'
+      +'<input type="checkbox" class="chk-keg chk-keg-item" id="chkSi_'+p.id+'" data-pid="'+p.id+'" data-keg="siang" data-tgt="'+p.target+'" '+kChecked('siang')+' '+chkDis+' title="Isi siang = target"></td>'
+      // HAMA
+      +'<td><input class="inp inp-date" type="date" id="tglH_'+p.id+'" value="'+th+'" '+kDis('hama')+'></td>'
+      +'<td style="white-space:nowrap"><input'+kClass('hama')+' type="number" step="0.1" min="0" id="hama_'+p.id+'" value="'+vHama+'" '+kDis('hama')+onchange+' placeholder="0">'
+      +'<input type="checkbox" class="chk-keg chk-keg-item" id="chkH_'+p.id+'" data-pid="'+p.id+'" data-keg="hama" data-tgt="'+p.target+'" '+kChecked('hama')+' '+chkDis+' title="Isi hama = target"></td>'
+      // PUPUK
+      +'<td><input class="inp inp-date" type="date" id="tglP_'+p.id+'" value="'+tp+'" '+kDis('pupuk')+'></td>'
+      +'<td style="white-space:nowrap"><input'+kClass('pupuk')+' type="number" step="0.1" min="0" id="pupuk_'+p.id+'" value="'+vPupuk+'" '+kDis('pupuk')+onchange+' placeholder="0">'
+      +'<input type="checkbox" class="chk-keg chk-keg-item" id="chkP_'+p.id+'" data-pid="'+p.id+'" data-keg="pupuk" data-tgt="'+p.target+'" '+kChecked('pupuk')+' '+chkDis+' title="Isi pupuk = target"></td>'
+      // CENTANG SEMUA petak
+      +'<td style="text-align:center"><input type="checkbox" class="chk-keg chk-all-petak" id="chkAll_'+p.id+'" data-pid="'+p.id+'" data-tgt="'+p.target+'" '+(allDone?'checked':'')+' '+chkDis+' title="Isi semua kegiatan = target"></td>'
       +"</tr>";
   });
   // Hitung kalkulator setelah render
   setTimeout(updateCalc,0);
 }
+
+// ── CENTANG KEGIATAN (event delegation) ──────────────────────────
+var KEG_INPUT_ID={jalur:'jalur_',sulam:'sulam_',siang:'siang_',hama:'hama_',pupuk:'pupuk_'};
+var KEG_CHK_ID={jalur:'chkJ_',sulam:'chkS_',siang:'chkSi_',hama:'chkH_',pupuk:'chkP_'};
+
+function checkKeg(pid, keg, target, checked){
+  var inp=document.getElementById(KEG_INPUT_ID[keg]+pid);
+  if(!inp)return;
+  if(checked){
+    inp.value=parseFloat(target).toFixed(2);
+    inp.disabled=true;
+    inp.classList.add('inp-locked');
+  } else {
+    inp.value="";
+    inp.disabled=false;
+    inp.classList.remove('inp-locked');
+  }
+  updateAllPetakCheck(pid);
+  updateCalc();
+}
+
+function checkAllPetak(pid, target, checked){
+  var kegs=Object.keys(KEG_INPUT_ID);
+  kegs.forEach(function(keg){
+    var chk=document.getElementById(KEG_CHK_ID[keg]+pid);
+    if(chk&&!chk.disabled){chk.checked=checked;checkKeg(pid,keg,target,checked);}
+  });
+}
+
+function updateAllPetakCheck(pid){
+  var blok=BLOK_DATA.find(function(b){return b.id===activeBlok});
+  var p=blok&&blok.petak.find(function(x){return x.id===pid});
+  if(!p)return;
+  var kegs=Object.keys(KEG_INPUT_ID);
+  var allFull=kegs.every(function(keg){
+    var inp=document.getElementById(KEG_INPUT_ID[keg]+pid);
+    return inp&&parseFloat(inp.value||0)>=p.target*0.95;
+  });
+  var ca=document.getElementById('chkAll_'+pid);
+  if(ca)ca.checked=allFull;
+}
+
+function checkAllKeg(keg, checked){
+  var blok=BLOK_DATA.find(function(b){return b.id===activeBlok});
+  if(!blok)return;
+  blok.petak.forEach(function(p){
+    var chk=document.getElementById(KEG_CHK_ID[keg]+p.id);
+    if(chk&&!chk.disabled){chk.checked=checked;checkKeg(p.id,keg,p.target,checked);}
+  });
+  blok.petak.forEach(function(p){updateAllPetakCheck(p.id);});
+}
+
+// Event delegation untuk checkbox di tabel petak
+document.addEventListener('change',function(e){
+  var el=e.target;
+  if(el.classList.contains('chk-keg-item')){
+    var pid=el.dataset.pid, keg=el.dataset.keg, tgt=el.dataset.tgt;
+    checkKeg(pid,keg,parseFloat(tgt),el.checked);
+  }
+  if(el.classList.contains('chk-all-petak')){
+    var pid=el.dataset.pid, tgt=el.dataset.tgt;
+    checkAllPetak(pid,parseFloat(tgt),el.checked);
+  }
+});
 
 // ── SAVE WEEK ─────────────────────────────────────────────────────
 async function saveWeek(){
