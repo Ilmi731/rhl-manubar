@@ -3223,16 +3223,30 @@ function haNum(v){return Math.round(parseFloat(v)||0)}
 function allPetak(){return BLOK_DATA.reduce(function(a,b){return a.concat(b.petak)},[])}
 function getEntry(pid,wk){return ((state.entries[pid]||{})[wk])||{}}
 
-// Ambil data dari minggu sebelumnya (untuk auto-fill)
-function getPrevEntry(pid){
+// Konversi weekKey ke angka untuk perbandingan urutan
+function wkToNum(wk){
+  const a=wk.split("-").map(Number);
+  return a[0]*10+a[1]; // bulan*10+minggu
+}
+
+// Apakah minggu yang dipilih (selBulan,selMinggu) >= minggu terakhir ada data?
+// True = ini minggu sekarang atau ke depan (boleh carry-over)
+// False = ini minggu ke belakang (tampil data asli saja)
+function isCurrentOrFuture(pid){
+  const e=state.entries[pid]||{};
+  const keys=Object.keys(e);
+  if(keys.length===0) return true; // belum ada data sama sekali
+  const selNum=wkToNum(wkKey(selBulan,selMinggu));
+  const maxNum=Math.max.apply(null,keys.map(wkToNum));
+  return selNum>=maxNum; // minggu yg dipilih >= minggu terakhir yang ada data
+}
+
+// Ambil data dari minggu terakhir yang ada (untuk carry-over ke depan)
+function getLastEntry(pid){
   const e=state.entries[pid]||{};
   const keys=Object.keys(e);
   if(keys.length===0) return {};
-  // Urutkan: bulan*10+minggu desc, ambil yang terbaru
-  keys.sort(function(a,b){
-    const pa=a.split("-").map(Number), pb=b.split("-").map(Number);
-    return (pb[0]*10+pb[1])-(pa[0]*10+pa[1]);
-  });
+  keys.sort(function(a,b){return wkToNum(b)-wkToNum(a)});
   return e[keys[0]]||{};
 }
 function setEntry(pid,wk,data){if(!state.entries[pid])state.entries[pid]={};state.entries[pid][wk]=data;persist();}
@@ -3292,7 +3306,7 @@ function renderProgBlok(){
       +'<div class="blok-name">'+blok.nama+'</div>'
       +'<div class="blok-track"><div class="blok-fill" style="width:'+pct+'%;background:'+cfg.col+'"></div></div>'
       +'<div class="blok-pct">'+pct+'%</div></div>'
-      +'<div class="blok-detail">'+doneP+'/'+blok.petak.length+' petak &bull; '+haNum(luas)+' / '+haNum(blok.target)+' ha</div></div>';
+      +'<div class="blok-detail">'+doneP+'/'+blok.petak.length+' petak • '+haNum(luas)+' / '+haNum(blok.target)+' ha</div></div>';
   });
 }
 
@@ -3365,7 +3379,7 @@ function renderBlokList(){
     const div=document.createElement("div");
     div.className="blok-item"+(blok.id===activeBlok?" active":"");
     div.innerHTML='<div class="blok-item-left"><div class="blok-item-name">'+blok.nama+'</div>'
-      +'<div class="blok-item-sub">'+blok.petak.length+' petak &middot; '+haNum(blok.target)+' ha</div></div>'
+      +'<div class="blok-item-sub">'+blok.petak.length+' petak · '+haNum(blok.target)+' ha</div></div>'
       +'<div class="blok-item-pct" style="color:'+col+'">'+pct+'%</div>';
     div.onclick=function(){activeBlok=blok.id;renderInput(blok.id);};
     ul.appendChild(div);
@@ -3403,22 +3417,30 @@ function renderInput(blokId){
     const e=getEntry(p.id,wk);
     const tot=getPetakTotals(p.id);
     const petakDone=isPetakDone(p.id,p.target);
+    // Terkunci jika: sudah 100% DAN (minggu ke depan/carry-over ATAU minggu ke belakang) DAN tidak di-unlock
     const dis=(petakDone&&!forceEdit)?' disabled="disabled"':"";
     const dotCol=petakDone?"#1D9E75":tot.jalur>0?"#C8762A":"#D8D3C5";
     const nameLbl=p.nama+(petakDone?(' <span class="done-cell" style="'+(forceEdit?'background:#FDF0DC;color:#8A4D0A':'')+'">100%'+(forceEdit?' (edit)':'')+'</span>'):"");
-    // Auto-fill: minggu ini dulu, kalau kosong ambil dari minggu sebelumnya
-    const prev=Object.keys(e).length===0 ? getPrevEntry(p.id) : {};
-    const isCarryOver=Object.keys(e).length===0 && Object.keys(prev).length>0;
-    // Nilai angka: pakai data minggu ini, atau carry-over dari sebelumnya jika kosong
-    const vJalur = e.jalur||prev.jalur||"";
-    const vSulam = e.sulam||prev.sulam||"";
-    const vSiang = e.siang||prev.siang||"";
-    const vHama  = e.hama ||prev.hama ||"";
-    const vPupuk = e.pupuk||prev.pupuk||"";
-    // Tanggal: selalu Jumat minggu ini
-    const tj=friStr, ts=friStr, tsi=friStr, th=friStr, tp=friStr;
-    // Badge carry-over
-    const carryBadge=isCarryOver?'<span style="font-size:9px;background:#E1F5EE;color:#0A6B48;padding:1px 6px;border-radius:99px;margin-left:4px">auto-isi</span>':"";
+    // ── Logika carry-over: hanya ke depan, tidak ke belakang ──────
+    const hasThisWeek=Object.keys(e).length>0;
+    const isFwd=isCurrentOrFuture(p.id); // minggu ini >= minggu terakhir data?
+    const last=(!hasThisWeek && isFwd && petakDone) ? getLastEntry(p.id) : {};
+    const isCarryOver=Object.keys(last).length>0;
+
+    // Nilai: kalau minggu ini ada data → pakai data itu
+    //        kalau minggu ini kosong & ke depan & sudah 100% → carry-over
+    //        kalau minggu ini kosong & ke belakang → tampil kosong
+    const vJalur = e.jalur||(isCarryOver?last.jalur:"")||"";
+    const vSulam = e.sulam||(isCarryOver?last.sulam:"")||"";
+    const vSiang = e.siang||(isCarryOver?last.siang:"")||"";
+    const vHama  = e.hama ||(isCarryOver?last.hama :"")||"";
+    const vPupuk = e.pupuk||(isCarryOver?last.pupuk:"")||"";
+    // Tanggal: selalu Jumat minggu yang dipilih
+    const tj=e.tglJalur||friStr, ts=e.tglSulam||friStr;
+    const tsi=e.tglSiang||friStr, th=e.tglHama||friStr, tp=e.tglPupuk||friStr;
+    // Badge
+    const carryBadge=isCarryOver?'<span style="font-size:9px;background:#E1F5EE;color:#0A6B48;padding:1px 6px;border-radius:99px;margin-left:4px">carry-over</span>':"";
+
     tbody.innerHTML+="<tr>"
       +'<td><div class="petak-name">'+nameLbl+carryBadge+'</div></td>'
       +'<td><span class="mono">'+haNum(p.target)+' ha</span></td>'
@@ -3584,7 +3606,7 @@ function renderStatDetail(){
       +'<div class="detail-card-icon" style="background:'+kg.col+'"></div>'
       +'</div>'
       +'<div class="detail-card-val">'+haNum(luas)+' ha</div>'
-      +'<div class="detail-card-sub">'+petakAda+' petak &bull; '+pct+'% target</div>'
+      +'<div class="detail-card-sub">'+petakAda+' petak • '+pct+'% target</div>'
       +'<div class="detail-card-bar"><div class="detail-card-fill" style="width:'+pct+'%;background:'+kg.col+'"></div></div>'
       +'</div>';
   });
@@ -3702,7 +3724,7 @@ function renderDashboard(){
     grid.innerHTML+='<div class="blok-prog"><div class="blok-row"><div class="blok-name">'+blok.nama+'</div>'
       +'<div class="blok-track"><div class="blok-fill" style="width:'+pct+'%;background:'+cols[i]+'"></div></div>'
       +'<div class="blok-pct">'+pct+'%</div></div>'
-      +'<div class="blok-detail">'+doneP+'/'+blok.petak.length+' petak &middot; '+haNum(luas)+' / '+haNum(blok.target)+' ha</div></div>';
+      +'<div class="blok-detail">'+doneP+'/'+blok.petak.length+' petak · '+haNum(luas)+' / '+haNum(blok.target)+' ha</div></div>';
   });
 
   // Weekly chart
