@@ -997,15 +997,41 @@ function allPetak(){return BLOK_DATA.reduce(function(a,b){return a.concat(b.peta
 function getEntry(pid,wk){return ((state.entries[pid]||{})[wk])||{}}
 function setEntry(pid,wk,data){if(!state.entries[pid])state.entries[pid]={};state.entries[pid][wk]=data;persist();}
 
-function getPetakTotals(pid){
+// Ambil nilai TERBARU per kegiatan untuk petak
+// (nilai adalah realisasi kumulatif, bukan tambahan per minggu)
+function getPetakLatestEntry(pid){
   var e=state.entries[pid]||{};
-  var jalur=0,sulam=0,siang=0,hama=0,pupuk=0;
-  Object.values(e).forEach(function(w){
-    jalur+=parseFloat(w.jalur||0);sulam+=parseFloat(w.sulam||0);
-    siang+=parseFloat(w.siang||0);hama+=parseFloat(w.hama||0);
-    pupuk+=parseFloat(w.pupuk||0);
+  var keys=Object.keys(e);
+  if(keys.length===0)return {};
+  // Urutkan weekKey dari terbaru ke terlama
+  keys.sort(function(a,b){return wkToNum(b)-wkToNum(a)});
+  // Untuk setiap kegiatan, ambil nilai dari weekKey terbaru yang ada nilainya
+  var result={jalur:0,sulam:0,siang:0,hama:0,pupuk:0,
+              tglJalur:"",tglSulam:"",tglSiang:"",tglHama:"",tglPupuk:""};
+  var kegs=["jalur","sulam","siang","hama","pupuk"];
+  var tgls={jalur:"tglJalur",sulam:"tglSulam",siang:"tglSiang",hama:"tglHama",pupuk:"tglPupuk"};
+  kegs.forEach(function(keg){
+    for(var i=0;i<keys.length;i++){
+      var val=parseFloat((e[keys[i]]||{})[keg]||0);
+      if(val>0){
+        result[keg]=val;
+        result[tgls[keg]]=(e[keys[i]]||{})[tgls[keg]]||"";
+        break;
+      }
+    }
   });
-  return {jalur:jalur,sulam:sulam,siang:siang,hama:hama,pupuk:pupuk};
+  return result;
+}
+
+function getPetakTotals(pid){
+  var latest=getPetakLatestEntry(pid);
+  return {
+    jalur:latest.jalur||0,
+    sulam:latest.sulam||0,
+    siang:latest.siang||0,
+    hama:latest.hama||0,
+    pupuk:latest.pupuk||0
+  };
 }
 
 function isPetakDone(pid,target){
@@ -1484,9 +1510,17 @@ function getKegLuas(keg,wkFilter){
   var total=0;
   allPetak().forEach(function(p){
     var e=state.entries[p.id]||{};
-    Object.entries(e).forEach(function(kv){
-      if(!wkFilter||wkFilter.indexOf(kv[0])>=0)total+=parseFloat(kv[1][keg]||0);
-    });
+    var keys=Object.keys(e);
+    if(keys.length===0)return;
+    // Filter weekKeys kalau ada filter periode
+    var fk=wkFilter?keys.filter(function(wk){return wkFilter.indexOf(wk)>=0}):keys;
+    if(fk.length===0)return;
+    // Ambil nilai terbaru untuk kegiatan ini (bukan sum)
+    fk.sort(function(a,b){return wkToNum(b)-wkToNum(a)});
+    for(var i=0;i<fk.length;i++){
+      var val=parseFloat((e[fk[i]]||{})[keg]||0);
+      if(val>0){total+=val;break;}
+    }
   });
   return total;
 }
@@ -1699,8 +1733,8 @@ function renderRekap(){
       +'<td>'+(bj>0?'<span class="badge b-part">'+Math.round(bj/blok.target*100)+'%</span>':'<span class="badge b-none">Belum</span>')+'</td></tr>';
     blok.petak.forEach(function(p){
       var t=getPetakTotals(p.id);
-      var allE=Object.values(state.entries[p.id]||{});
-      function lastTgl(k){return allE.map(function(e){return e[k]||""}).filter(Boolean).sort().pop()||"-"}
+      var latestE=getPetakLatestEntry(p.id);
+      function lastTgl(k){return latestE[k]||"-"}
       var done=isPetakDone(p.id,p.target);
       var part=(t.jalur+t.sulam+t.siang+t.hama+t.pupuk)>0&&!done;
       tbody.innerHTML+='<tr><td style="padding-left:18px">'+p.nama+'</td><td class="mono">'+haNum(p.target)+' ha</td>'
