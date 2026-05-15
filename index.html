@@ -50,6 +50,786 @@ main{max-width:1280px;margin:0 auto;padding:22px 18px 60px}
 .stat-card.accent .stat-val{color:var(--teal2)}
 .stat-sub{font-size:10px;color:var(--ink4);margin-top:2px}
 .stat-card.accent .stat-sub{color:rgba(255,255,255,.4)}
+/* STATISTIK TABS */
+.stat-period-bar{display:flex;gap:0;margin-bottom:16px;border:1px solid var(--sand3);border-radius:8px;overflow:hidden;width:fit-content}
+.stat-period-btn{font-family:"DM Mono",monospace;font-size:11px;font-weight:500;padding:6px 16px;border:none;background:var(--white);color:var(--ink3);cursor:pointer;transition:all .2s;border-right:1px solid var(--sand3)}
+.stat-period-btn:last-child{border-right:none}
+.stat-period-btn.active{background:var(--forest);color:white}
+.stat-period-btn:hover:not(.active){background:var(--sand2)}
+/* RINGKASAN DETAIL */
+.detail-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.detail-card{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow-sm)}
+.detail-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.detail-card-lbl{font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink4)}
+.detail-card-icon{width:6px;height:6px;border-radius:50%}
+.detail-card-val{font-family:"Fraunces",serif;font-size:20px;font-weight:600;color:var(--forest);line-height:1}
+.detail-card-sub{font-size:10px;color:var(--ink4);margin-top:2px}
+.detail-card-bar{height:3px;border-radius:99px;background:var(--sand2);margin-top:8px;overflow:hidden}
+.detail-card-fill{height:100%;border-radius:99px;transition:width .6s}
+/* TABEL RINGKASAN MINGGUAN */
+.week-summary-table{width:100%;border-collapse:collapse;font-size:11px}
+.week-summary-table th{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:white;background:var(--forest);padding:8px 10px;white-space:nowrap}
+.week-summary-table td{padding:6px 10px;border-bottom:1px solid var(--sand2)}
+.week-summary-table tr:nth-child(even) td{background:var(--sand)}
+.week-summary-table tr:hover td{background:var(--teal-lt)}
+/* KEGIATAN FILTER TABS */
+.keg-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.keg-tab{font-family:"DM Mono",monospace;font-size:11px;font-weight:500;padding:5px 12px;
+  border-radius:99px;border:1.5px solid var(--sand3);background:var(--white);
+  color:var(--ink3);cursor:pointer;transition:all .2s}
+.keg-tab:hover{border-color:var(--teal);color:var(--teal)}
+.keg-tab.active{border-color:transparent;color:white}
+/* LOCK EDIT MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);
+  z-index:200;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--white);border-radius:var(--radius-lg);padding:24px 28px;
+  max-width:420px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.modal-title{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:var(--forest);margin-bottom:8px}
+.modal-desc{font-size:13px;color:var(--ink3);line-height:1.6;margin-bottom:18px}
+.modal-warning{font-size:12px;color:var(--red);background:var(--red-lt);
+  padding:10px 14px;border-radius:8px;margin-bottom:18px;font-weight:500}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end}
+.modal-btn-cancel{font-size:13px;padding:8px 18px;border-radius:7px;
+  border:1px solid var(--sand3);background:var(--sand);color:var(--ink3);cursor:pointer}
+.modal-btn-confirm{font-size:13px;font-weight:600;padding:8px 18px;border-radius:7px;
+  border:none;background:var(--amber);color:white;cursor:pointer}
+.modal-btn-confirm:hover{background:#A05E1A}
+/* LOCK WARNING BANNER */
+.lock-banner{display:none;border-radius:8px;padding:9px 14px;margin:10px 16px;
+  font-size:12px;font-weight:500;align-items:center;gap:8px}
+.lock-banner.show{display:flex}
+.lock-banner.warn{background:var(--amber-lt);border:1px solid #F0DCBA;color:#7A4A0A}
+/* PROGRESS */
+.prog-section{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);padding:18px;box-shadow:var(--shadow-sm)}
+.prog-header{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--ink3);margin-bottom:14px}
+.prog-header strong{font-family:"Fraunces",serif;font-size:14px;color:var(--ink);font-weight:600}
+.blok-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px}
+.blok-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.blok-name{font-size:12px;font-weight:600;color:var(--ink);width:50px;flex-shrink:0}
+.blok-track{flex:1;height:8px;background:var(--sand2);border-radius:99px;overflow:hidden}
+.blok-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.blok-pct{font-family:"DM Mono",monospace;font-size:11px;color:var(--ink3);width:34px;text-align:right}
+.blok-detail{font-size:10px;color:var(--ink4);padding-left:60px}
+/* CHARTS */
+.chart-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:12px}
+.chart-card{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow-sm)}
+.chart-card.full{grid-column:1/-1}
+.chart-title{font-family:"Fraunces",serif;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.chart-sub{font-size:11px;color:var(--ink4);margin-bottom:10px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--ink3);margin-bottom:8px}
+.leg{display:flex;align-items:center;gap:4px}
+.leg-sq{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+/* HEATMAP */
+.heatmap-wrap{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow-sm)}
+.hm-title{font-family:"Fraunces",serif;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:10px}
+.hm-month-labels{display:grid;grid-template-columns:repeat(12,1fr);font-size:10px;color:var(--ink4);margin-bottom:4px;font-family:"DM Mono",monospace;text-align:center}
+.hm-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:4px}
+.hm-col{display:flex;flex-direction:column;gap:3px}
+.hm-cell{height:18px;border-radius:3px;cursor:default;transition:transform .15s}
+.hm-cell:hover{transform:scale(1.15);position:relative;z-index:1}
+.hm-legend{display:flex;gap:10px;margin-top:10px;font-size:10px;color:var(--ink4);align-items:center;flex-wrap:wrap}
+.hm-legend-item{display:flex;align-items:center;gap:4px}
+.hm-dot{width:11px;height:11px;border-radius:2px}
+/* INPUT */
+.input-layout{display:grid;grid-template-columns:255px 1fr;gap:14px;align-items:start}
+.blok-sidebar{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);position:sticky;top:68px}
+.sidebar-header{background:var(--forest);padding:12px 14px}
+.sidebar-header p{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.sidebar-header h3{font-family:"Fraunces",serif;font-size:15px;font-weight:600;color:white;margin-top:2px}
+.blok-item{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--sand2);transition:background .15s}
+.blok-item:hover{background:var(--sand)}
+.blok-item.active{background:var(--teal-lt);border-left:3px solid var(--teal)}
+.blok-item-name{font-size:13px;font-weight:600;color:var(--ink)}
+.blok-item-sub{font-size:10px;color:var(--ink4);margin-top:1px}
+.blok-item-pct{font-family:"DM Mono",monospace;font-size:12px;font-weight:500}
+.form-card{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:12px}
+.form-card-header{background:var(--sand);border-bottom:1px solid var(--sand3);padding:11px 16px;display:flex;justify-content:space-between;align-items:center}
+.form-card-header h4{font-size:13px;font-weight:600;color:var(--ink)}
+.form-card-header span{font-size:11px;color:var(--ink4)}
+.week-select-bar{display:flex;gap:8px;align-items:center;padding:10px 16px;background:var(--amber-lt);border-bottom:1px solid #F0DCBA;flex-wrap:wrap}
+.week-select-bar label{font-size:12px;font-weight:500;color:var(--amber)}
+.week-select-bar select{font-family:"DM Mono",monospace;font-size:12px;padding:5px 9px;border:1px solid #D4A96A;border-radius:6px;background:white;color:var(--ink)}
+.friday-info{font-size:11px;color:var(--amber);font-weight:600;padding:4px 10px;background:rgba(200,118,42,.1);border-radius:6px;border:1px solid rgba(200,118,42,.25)}
+/* LOCK */
+.lock-banner{display:none;background:var(--teal-lt);border:1px solid var(--teal-mid);border-radius:8px;padding:9px 14px;margin:10px 16px;font-size:12px;color:#0A6B48;font-weight:500;align-items:center;gap:8px}
+.lock-banner.show{display:flex}
+/* TABLE */
+.petak-table{width:100%;border-collapse:collapse}
+.petak-table th{font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink4);background:var(--sand);padding:8px 7px;text-align:left;border-bottom:1px solid var(--sand3);white-space:nowrap}
+.petak-table td{padding:5px 7px;border-bottom:1px solid var(--sand2);vertical-align:middle}
+.petak-table tr:last-child td{border-bottom:none}
+.petak-table tr:nth-child(even) td{background:rgba(245,242,234,.45)}
+.petak-name{font-size:12px;font-weight:500;color:var(--ink)}
+.done-cell{font-family:"DM Mono",monospace;font-size:10px;color:#0A6B48;background:var(--teal-lt);padding:2px 7px;border-radius:99px}
+.inp{font-family:"DM Mono",monospace;font-size:11px;padding:4px 6px;border:1px solid var(--sand3);border-radius:5px;background:var(--white);color:var(--ink);width:78px;transition:border-color .15s}
+.inp:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 2px rgba(29,158,117,.1)}
+.inp:disabled{background:var(--sand2);color:var(--ink4);cursor:not-allowed;opacity:.7}
+.inp-date{width:122px}
+.inp-sm{width:62px}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+.btn-save{font-family:"DM Sans",sans-serif;font-size:13px;font-weight:600;padding:9px 22px;background:var(--teal);color:white;border:none;border-radius:8px;cursor:pointer;transition:background .15s}
+.btn-save:hover{background:var(--forest3)}
+.btn-save:disabled{background:var(--sand3);cursor:not-allowed}
+.btn-row{padding:12px 16px;display:flex;gap:10px;align-items:center;border-top:1px solid var(--sand2)}
+.save-msg{font-size:12px;color:var(--teal);font-weight:500}
+/* REKAP */
+.rekap-wrap{overflow-x:auto}
+.rekap-table{width:100%;border-collapse:collapse;font-size:11px;min-width:1200px}
+.rekap-table th{font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:white;background:var(--forest);padding:8px 9px;white-space:nowrap}
+.rekap-table th.sub{background:var(--forest2);font-size:8px}
+.rekap-table td{padding:5px 9px;border-bottom:1px solid var(--sand2)}
+.rekap-table tr.blok-row-r td{background:var(--forest);color:white;font-weight:600}
+.rekap-table tr:nth-child(even):not(.blok-row-r) td{background:var(--sand)}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;font-family:"DM Mono",monospace}
+.b-done{background:var(--teal-lt);color:#0A6B48}
+.b-part{background:var(--amber-lt);color:#8A4D0A}
+.b-none{background:var(--sand2);color:var(--ink4)}
+.mono{font-family:"DM Mono",monospace}
+@media(max-width:800px){
+  .stat-grid{grid-template-columns:repeat(3,1fr)}
+  .chart-grid{grid-template-columns:1fr}
+  .chart-card.full{grid-column:1}
+  .input-layout{grid-template-columns:1fr}
+  .blok-sidebar{position:static}
+  .blok-grid{grid-template-columns:1fr}
+  .app-header{padding:0 10px;flex-wrap:wrap}
+  main{padding:12px 10px 48px}
+}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="header-brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20c9 0 10-8 17-13.38A20.56 20.56 0 0117 8z"/><path d="M11.05 11.39c.96-1.79 2.17-3.44 3.47-4.39A14.24 14.24 0 0121 5c-4.17 3.08-5.65 6.95-6.84 9.91A11 11 0 019 16c.37-1.61.95-3.18 2.05-4.61z" opacity=".3"/></svg>
+    </div>
+    <div class="brand-text">
+      <h1>RHL Tracker - KPHP Manubar</h1>
+      <p>PT. Multi Harapan Utama &middot; CV. Langit Alas Kalimantan</p>
+    </div>
+  </div>
+  <div class="header-tabs">
+    <button class="tab-btn active" onclick="switchView('dashboard')">Dashboard</button>
+    <button class="tab-btn" onclick="switchView('input')">Input Mingguan</button>
+    <button class="tab-btn" onclick="switchView('rekap')">Rekap Lengkap</button>
+  </div>
+  <div class="header-right">
+    <div id="syncStatus" class="sync-badge">&#9675; Memuat...</div>
+    <div class="week-badge" id="weekBadge">--</div>
+  </div>
+</header>
+
+<main>
+<!-- DASHBOARD -->
+<div id="view-dashboard" class="view active">
+  <div class="sec">Ringkasan Eksekutif</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+    <div style="font-size:12px;color:var(--ink3)">Filter periode statistik:</div>
+    <div class="stat-period-bar">
+      <button class="stat-period-btn" id="spbMinggu" onclick="setStatPeriod('minggu')">Minggu Ini</button>
+      <button class="stat-period-btn" id="spbBulan" onclick="setStatPeriod('bulan')">Bulan Ini</button>
+      <button class="stat-period-btn active" id="spbTahun" onclick="setStatPeriod('tahun')">Seluruh Tahun</button>
+    </div>
+    <div style="font-size:11px;color:var(--ink4)" id="statPeriodLabel">Semua data</div>
+  </div>
+  <!-- Summary row atas -->
+  <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px">
+    <div class="stat-card accent">
+      <div class="stat-lbl">Total Target</div>
+      <div class="stat-val">1.407 ha</div>
+      <div class="stat-sub">7 blok &middot; 56 petak</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Petak Aktif</div>
+      <div class="stat-val" id="s-aktif">0</div>
+      <div class="stat-sub" id="s-aktif-sub">ada kegiatan</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Petak Selesai Semua</div>
+      <div class="stat-val" id="s-selesai">0</div>
+      <div class="stat-sub">dari 56 petak</div>
+    </div>
+  </div>
+  <!-- Detail 5 kegiatan -->
+  <div class="detail-grid" id="detailGrid"></div>
+  <!-- Tabel ringkasan per minggu/bulan -->
+  <div class="chart-card" style="margin-bottom:14px" id="weekTableWrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div>
+        <div class="chart-title" id="weekTableTitle">Ringkasan per Minggu</div>
+        <div class="chart-sub" id="weekTableSub">Realisasi luas per kegiatan</div>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="week-summary-table" id="weekSummaryTable">
+        <thead id="weekSummaryHead"></thead>
+        <tbody id="weekSummaryBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sec">Progres Per Blok</div>
+  <div class="prog-section">
+    <div class="prog-header">
+      <strong id="progTitle">Capaian per blok</strong>
+      <div class="keg-tabs" id="kegTabs">
+        <button class="keg-tab active" data-keg="jalur" style="background:#1D9E75;border-color:#1D9E75" onclick="setKegFilter('jalur',this)">Pembersihan Jalur</button>
+        <button class="keg-tab" data-keg="sulam" onclick="setKegFilter('sulam',this)">Penyulaman</button>
+        <button class="keg-tab" data-keg="siang" onclick="setKegFilter('siang',this)">Penyiangan</button>
+        <button class="keg-tab" data-keg="hama" onclick="setKegFilter('hama',this)">P. Hama</button>
+        <button class="keg-tab" data-keg="pupuk" onclick="setKegFilter('pupuk',this)">Pemupukan</button>
+      </div>
+    </div>
+    <div class="blok-grid" id="blokProgGrid"></div>
+  </div>
+
+  <div class="sec">Visualisasi Data</div>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Realisasi kegiatan per minggu</div>
+      <div class="chart-sub">Jumlah petak pembersihan jalur tiap minggu</div>
+      <div style="position:relative;height:200px"><canvas id="chartWeekly"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Komposisi capaian</div>
+      <div class="chart-sub">Status 5 kegiatan seluruh petak</div>
+      <div class="legend">
+        <span class="leg"><span class="leg-sq" style="background:#1D9E75"></span>Selesai semua</span>
+        <span class="leg"><span class="leg-sq" style="background:#C8762A"></span>Sebagian</span>
+        <span class="leg"><span class="leg-sq" style="background:#D8D3C5"></span>Belum</span>
+      </div>
+      <div style="position:relative;height:170px"><canvas id="chartDonut"></canvas></div>
+    </div>
+    <div class="chart-card full">
+      <div class="chart-title">Realisasi luas per kegiatan per blok (ha)</div>
+      <div class="chart-sub">Perbandingan 5 jenis kegiatan antar blok vs target</div>
+      <div class="legend">
+        <span class="leg"><span class="leg-sq" style="background:#1B3A2E"></span>Target</span>
+        <span class="leg"><span class="leg-sq" style="background:#1D9E75"></span>Pembersihan Jalur</span>
+        <span class="leg"><span class="leg-sq" style="background:#378ADD"></span>Penyulaman</span>
+        <span class="leg"><span class="leg-sq" style="background:#639922"></span>Penyiangan</span>
+        <span class="leg"><span class="leg-sq" style="background:#EF9F27"></span>P. Hama</span>
+        <span class="leg"><span class="leg-sq" style="background:#534AB7"></span>Pemupukan</span>
+      </div>
+      <div style="position:relative;height:220px"><canvas id="chartBlok"></canvas></div>
+    </div>
+  </div>
+
+  <div class="sec">Heat Map Aktivitas Mingguan</div>
+  <div class="heatmap-wrap">
+    <div class="hm-title">Aktivitas Pembersihan Jalur per minggu</div>
+    <div class="hm-month-labels" id="hmMonthLabels"></div>
+    <div class="hm-grid" id="hmGrid"></div>
+    <div class="hm-legend">
+      <span>Intensitas:</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#D8D3C5"></div>Belum</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#A8E3CD"></div>1-2 petak</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#1D9E75"></div>3-5 petak</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#1B3A2E"></div>6+ petak</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--ink4)">Kolom=Bulan, Baris=Minggu 1-4</span>
+    </div>
+  </div>
+</div>
+
+<!-- INPUT -->
+<div id="view-input" class="view">
+  <div class="sec">Input Data Mingguan</div>
+  <div class="input-layout">
+    <div class="blok-sidebar">
+      <div class="sidebar-header">
+        <p>Pilih blok</p>
+        <h3 id="sidebarBlokTitle">Blok 1</h3>
+      </div>
+      <div class="blok-list" id="blokList"></div>
+    </div>
+    <div class="form-area">
+      <div class="form-card">
+        <div class="form-card-header">
+          <h4 id="formTitle">Blok 1 - Input Kegiatan</h4>
+          <span id="formTarget">Target: 182 ha</span>
+        </div>
+        <div class="week-select-bar">
+          <label>Bulan</label>
+          <select id="bulanSel"></select>
+          <label style="margin-left:10px">Minggu ke-</label>
+          <select id="weekSel"></select>
+          <div class="friday-info" id="fridayInfo">Jumat: --</div>
+        </div>
+        <div id="lockBanner" class="lock-banner warn">
+          &#9888; Semua kegiatan di blok ini sudah 100%. Klik tombol di bawah untuk mengedit dengan konfirmasi.
+        </div>
+        <div style="overflow-x:auto">
+          <table class="petak-table">
+            <thead>
+              <tr>
+                <th>Petak</th>
+                <th>Target (ha)</th>
+                <th>Tgl Jalur</th>
+                <th>Pembersihan Jalur (ha)</th>
+                <th>Tgl Sulam</th>
+                <th>Penyulaman (ha)</th>
+                <th>Tgl Siang</th>
+                <th>Penyiangan &amp; Pendangiran (ha)</th>
+                <th>Tgl Hama</th>
+                <th>P. Hama &amp; Penyakit (ha)</th>
+                <th>Tgl Pupuk</th>
+                <th>Pemupukan (ha)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="petakBody"></tbody>
+          </table>
+        </div>
+        <div class="btn-row">
+          <button class="btn-save" id="btnSave" onclick="saveWeek()">Simpan Minggu Ini</button>
+          <button class="btn-save" id="btnUnlock" onclick="openEditModal()" style="display:none;background:var(--amber)">&#9999; Edit Data 100%</button>
+          <span class="save-msg" id="saveMsg"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REKAP -->
+<div id="view-rekap" class="view">
+  <div class="sec">Rekap Lengkap Semua Blok &amp; Petak</div>
+  <div class="form-card">
+    <div class="rekap-wrap">
+      <table class="rekap-table">
+        <thead>
+          <tr>
+            <th rowspan="2">Blok / Petak</th>
+            <th rowspan="2">Target (ha)</th>
+            <th colspan="2">Pembersihan Jalur</th>
+            <th colspan="2">Penyulaman</th>
+            <th colspan="2">Penyiangan &amp; Pendangiran</th>
+            <th colspan="2">P. Hama &amp; Penyakit</th>
+            <th colspan="2">Pemupukan</th>
+            <th rowspan="2">Status</th>
+          </tr>
+          <tr>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+          </tr>
+        </thead>
+        <tbody id="rekapBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</main>
+
+
+<style>
+:root{
+  --forest:#1B3A2E;--forest2:#234D3C;--forest3:#2D6B50;
+  --teal:#1D9E75;--teal2:#25C491;--teal-lt:#E1F5EE;--teal-mid:#A8E3CD;
+  --amber:#C8762A;--amber-lt:#FDF0DC;
+  --red:#C0392B;--red-lt:#FDEAEA;
+  --blue:#378ADD;--green:#639922;--coral:#D85A30;--purple:#534AB7;
+  --sand:#F5F2EA;--sand2:#EDE9DF;--sand3:#D8D3C5;
+  --ink:#1C1A16;--ink2:#3D3A32;--ink3:#6B6860;--ink4:#9B9890;
+  --white:#FDFCF8;--radius:10px;--radius-lg:16px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.06);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:"DM Sans",sans-serif;background:var(--sand);color:var(--ink);min-height:100vh}
+/* HEADER */
+.app-header{background:var(--forest);padding:0 28px;display:flex;align-items:stretch;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.28)}
+.header-brand{display:flex;align-items:center;gap:12px;padding:12px 0}
+.brand-icon{width:34px;height:34px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-icon svg{width:18px;height:18px;fill:white}
+.brand-text h1{font-family:"Fraunces",serif;font-size:14px;font-weight:600;color:white}
+.brand-text p{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+.header-tabs{display:flex;align-items:stretch;gap:2px}
+.tab-btn{font-family:"DM Sans",sans-serif;font-size:11px;font-weight:500;color:rgba(255,255,255,.5);background:none;border:none;cursor:pointer;padding:0 16px;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.04em;text-transform:uppercase}
+.tab-btn:hover{color:rgba(255,255,255,.85)}
+.tab-btn.active{color:var(--teal2);border-bottom-color:var(--teal2)}
+.header-right{display:flex;align-items:center;gap:8px;padding:12px 0}
+.sync-badge{font-family:"DM Mono",monospace;font-size:10px;padding:4px 10px;border-radius:99px;border:1px solid rgba(29,158,117,.3);background:rgba(29,158,117,.15);color:#25C491}
+.week-badge{font-family:"DM Mono",monospace;font-size:10px;color:var(--teal2);background:rgba(29,158,117,.15);border:1px solid rgba(29,158,117,.3);padding:4px 10px;border-radius:99px}
+/* LAYOUT */
+main{max-width:1280px;margin:0 auto;padding:22px 18px 60px}
+.view{display:none}.view.active{display:block}
+.sec{font-family:"DM Mono",monospace;font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin:26px 0 10px;display:flex;align-items:center;gap:10px}
+.sec::after{content:"";flex:1;height:1px;background:var(--teal-lt)}
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:4px}
+.stat-card{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow-sm)}
+.stat-card.accent{background:var(--forest);border-color:var(--forest)}
+.stat-lbl{font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink4);margin-bottom:3px;line-height:1.3}
+.stat-card.accent .stat-lbl{color:rgba(255,255,255,.5)}
+.stat-val{font-family:"Fraunces",serif;font-size:22px;font-weight:600;color:var(--forest);line-height:1}
+.stat-card.accent .stat-val{color:var(--teal2)}
+.stat-sub{font-size:10px;color:var(--ink4);margin-top:2px}
+.stat-card.accent .stat-sub{color:rgba(255,255,255,.4)}
+/* PROGRESS */
+.prog-section{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);padding:18px;box-shadow:var(--shadow-sm)}
+.prog-header{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--ink3);margin-bottom:14px}
+.prog-header strong{font-family:"Fraunces",serif;font-size:14px;color:var(--ink);font-weight:600}
+.blok-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px}
+.blok-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.blok-name{font-size:12px;font-weight:600;color:var(--ink);width:50px;flex-shrink:0}
+.blok-track{flex:1;height:8px;background:var(--sand2);border-radius:99px;overflow:hidden}
+.blok-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.blok-pct{font-family:"DM Mono",monospace;font-size:11px;color:var(--ink3);width:34px;text-align:right}
+.blok-detail{font-size:10px;color:var(--ink4);padding-left:60px}
+/* CHARTS */
+.chart-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:12px}
+.chart-card{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow-sm)}
+.chart-card.full{grid-column:1/-1}
+.chart-title{font-family:"Fraunces",serif;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.chart-sub{font-size:11px;color:var(--ink4);margin-bottom:10px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--ink3);margin-bottom:8px}
+.leg{display:flex;align-items:center;gap:4px}
+.leg-sq{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+/* HEATMAP */
+.heatmap-wrap{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow-sm)}
+.hm-title{font-family:"Fraunces",serif;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:10px}
+.hm-month-labels{display:grid;grid-template-columns:repeat(12,1fr);font-size:10px;color:var(--ink4);margin-bottom:4px;font-family:"DM Mono",monospace;text-align:center}
+.hm-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:4px}
+.hm-col{display:flex;flex-direction:column;gap:3px}
+.hm-cell{height:18px;border-radius:3px;cursor:default;transition:transform .15s}
+.hm-cell:hover{transform:scale(1.15);position:relative;z-index:1}
+.hm-legend{display:flex;gap:10px;margin-top:10px;font-size:10px;color:var(--ink4);align-items:center;flex-wrap:wrap}
+.hm-legend-item{display:flex;align-items:center;gap:4px}
+.hm-dot{width:11px;height:11px;border-radius:2px}
+/* INPUT */
+.input-layout{display:grid;grid-template-columns:255px 1fr;gap:14px;align-items:start}
+.blok-sidebar{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);position:sticky;top:68px}
+.sidebar-header{background:var(--forest);padding:12px 14px}
+.sidebar-header p{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.sidebar-header h3{font-family:"Fraunces",serif;font-size:15px;font-weight:600;color:white;margin-top:2px}
+.blok-item{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--sand2);transition:background .15s}
+.blok-item:hover{background:var(--sand)}
+.blok-item.active{background:var(--teal-lt);border-left:3px solid var(--teal)}
+.blok-item-name{font-size:13px;font-weight:600;color:var(--ink)}
+.blok-item-sub{font-size:10px;color:var(--ink4);margin-top:1px}
+.blok-item-pct{font-family:"DM Mono",monospace;font-size:12px;font-weight:500}
+.form-card{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:12px}
+.form-card-header{background:var(--sand);border-bottom:1px solid var(--sand3);padding:11px 16px;display:flex;justify-content:space-between;align-items:center}
+.form-card-header h4{font-size:13px;font-weight:600;color:var(--ink)}
+.form-card-header span{font-size:11px;color:var(--ink4)}
+.week-select-bar{display:flex;gap:8px;align-items:center;padding:10px 16px;background:var(--amber-lt);border-bottom:1px solid #F0DCBA;flex-wrap:wrap}
+.week-select-bar label{font-size:12px;font-weight:500;color:var(--amber)}
+.week-select-bar select{font-family:"DM Mono",monospace;font-size:12px;padding:5px 9px;border:1px solid #D4A96A;border-radius:6px;background:white;color:var(--ink)}
+.friday-info{font-size:11px;color:var(--amber);font-weight:600;padding:4px 10px;background:rgba(200,118,42,.1);border-radius:6px;border:1px solid rgba(200,118,42,.25)}
+/* LOCK */
+.lock-banner{display:none;background:var(--teal-lt);border:1px solid var(--teal-mid);border-radius:8px;padding:9px 14px;margin:10px 16px;font-size:12px;color:#0A6B48;font-weight:500;align-items:center;gap:8px}
+.lock-banner.show{display:flex}
+/* TABLE */
+.petak-table{width:100%;border-collapse:collapse}
+.petak-table th{font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink4);background:var(--sand);padding:8px 7px;text-align:left;border-bottom:1px solid var(--sand3);white-space:nowrap}
+.petak-table td{padding:5px 7px;border-bottom:1px solid var(--sand2);vertical-align:middle}
+.petak-table tr:last-child td{border-bottom:none}
+.petak-table tr:nth-child(even) td{background:rgba(245,242,234,.45)}
+.petak-name{font-size:12px;font-weight:500;color:var(--ink)}
+.done-cell{font-family:"DM Mono",monospace;font-size:10px;color:#0A6B48;background:var(--teal-lt);padding:2px 7px;border-radius:99px}
+.inp{font-family:"DM Mono",monospace;font-size:11px;padding:4px 6px;border:1px solid var(--sand3);border-radius:5px;background:var(--white);color:var(--ink);width:78px;transition:border-color .15s}
+.inp:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 2px rgba(29,158,117,.1)}
+.inp:disabled{background:var(--sand2);color:var(--ink4);cursor:not-allowed;opacity:.7}
+.inp-date{width:122px}
+.inp-sm{width:62px}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+.btn-save{font-family:"DM Sans",sans-serif;font-size:13px;font-weight:600;padding:9px 22px;background:var(--teal);color:white;border:none;border-radius:8px;cursor:pointer;transition:background .15s}
+.btn-save:hover{background:var(--forest3)}
+.btn-save:disabled{background:var(--sand3);cursor:not-allowed}
+.btn-row{padding:12px 16px;display:flex;gap:10px;align-items:center;border-top:1px solid var(--sand2)}
+.save-msg{font-size:12px;color:var(--teal);font-weight:500}
+/* REKAP */
+.rekap-wrap{overflow-x:auto}
+.rekap-table{width:100%;border-collapse:collapse;font-size:11px;min-width:1200px}
+.rekap-table th{font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:white;background:var(--forest);padding:8px 9px;white-space:nowrap}
+.rekap-table th.sub{background:var(--forest2);font-size:8px}
+.rekap-table td{padding:5px 9px;border-bottom:1px solid var(--sand2)}
+.rekap-table tr.blok-row-r td{background:var(--forest);color:white;font-weight:600}
+.rekap-table tr:nth-child(even):not(.blok-row-r) td{background:var(--sand)}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;font-family:"DM Mono",monospace}
+.b-done{background:var(--teal-lt);color:#0A6B48}
+.b-part{background:var(--amber-lt);color:#8A4D0A}
+.b-none{background:var(--sand2);color:var(--ink4)}
+.mono{font-family:"DM Mono",monospace}
+@media(max-width:800px){
+  .stat-grid{grid-template-columns:repeat(3,1fr)}
+  .chart-grid{grid-template-columns:1fr}
+  .chart-card.full{grid-column:1}
+  .input-layout{grid-template-columns:1fr}
+  .blok-sidebar{position:static}
+  .blok-grid{grid-template-columns:1fr}
+  .app-header{padding:0 10px;flex-wrap:wrap}
+  main{padding:12px 10px 48px}
+}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="header-brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20c9 0 10-8 17-13.38A20.56 20.56 0 0117 8z"/><path d="M11.05 11.39c.96-1.79 2.17-3.44 3.47-4.39A14.24 14.24 0 0121 5c-4.17 3.08-5.65 6.95-6.84 9.91A11 11 0 019 16c.37-1.61.95-3.18 2.05-4.61z" opacity=".3"/></svg>
+    </div>
+    <div class="brand-text">
+      <h1>RHL Tracker - KPHP Manubar</h1>
+      <p>PT. Multi Harapan Utama &middot; CV. Langit Alas Kalimantan</p>
+    </div>
+  </div>
+  <div class="header-tabs">
+    <button class="tab-btn active" onclick="switchView('dashboard')">Dashboard</button>
+    <button class="tab-btn" onclick="switchView('input')">Input Mingguan</button>
+    <button class="tab-btn" onclick="switchView('rekap')">Rekap Lengkap</button>
+  </div>
+  <div class="header-right">
+    <div id="syncStatus" class="sync-badge">&#9675; Memuat...</div>
+    <div class="week-badge" id="weekBadge">--</div>
+  </div>
+</header>
+
+<main>
+<!-- DASHBOARD -->
+<div id="view-dashboard" class="view active">
+  <div class="sec">Ringkasan Eksekutif</div>
+  <div class="stat-grid">
+    <div class="stat-card accent">
+      <div class="stat-lbl">Total Target</div>
+      <div class="stat-val">1.407 ha</div>
+      <div class="stat-sub">7 blok &middot; 56 petak</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Pembersihan Jalur</div>
+      <div class="stat-val" id="s-jalur">0</div>
+      <div class="stat-sub">petak selesai</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Penyulaman</div>
+      <div class="stat-val" id="s-sulam">0</div>
+      <div class="stat-sub">petak selesai</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Penyiangan &amp; Pendangiran</div>
+      <div class="stat-val" id="s-siang">0</div>
+      <div class="stat-sub">petak selesai</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">P. Hama &amp; Penyakit</div>
+      <div class="stat-val" id="s-hama">0</div>
+      <div class="stat-sub">petak selesai</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Pemupukan</div>
+      <div class="stat-val" id="s-pupuk">0</div>
+      <div class="stat-sub">petak selesai</div>
+    </div>
+  </div>
+
+  <div class="sec">Progres Per Blok</div>
+  <div class="prog-section">
+    <div class="prog-header">
+      <strong>Capaian per blok (Pembersihan Jalur)</strong>
+      <span>Jalur &middot; Sulam &middot; Siang &middot; Hama &middot; Pupuk</span>
+    </div>
+    <div class="blok-grid" id="blokProgGrid"></div>
+  </div>
+
+  <div class="sec">Visualisasi Data</div>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Realisasi kegiatan per minggu</div>
+      <div class="chart-sub">Jumlah petak pembersihan jalur tiap minggu</div>
+      <div style="position:relative;height:200px"><canvas id="chartWeekly"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Komposisi capaian</div>
+      <div class="chart-sub">Status 5 kegiatan seluruh petak</div>
+      <div class="legend">
+        <span class="leg"><span class="leg-sq" style="background:#1D9E75"></span>Selesai semua</span>
+        <span class="leg"><span class="leg-sq" style="background:#C8762A"></span>Sebagian</span>
+        <span class="leg"><span class="leg-sq" style="background:#D8D3C5"></span>Belum</span>
+      </div>
+      <div style="position:relative;height:170px"><canvas id="chartDonut"></canvas></div>
+    </div>
+    <div class="chart-card full">
+      <div class="chart-title">Realisasi luas per kegiatan per blok (ha)</div>
+      <div class="chart-sub">Perbandingan 5 jenis kegiatan antar blok vs target</div>
+      <div class="legend">
+        <span class="leg"><span class="leg-sq" style="background:#1B3A2E"></span>Target</span>
+        <span class="leg"><span class="leg-sq" style="background:#1D9E75"></span>Pembersihan Jalur</span>
+        <span class="leg"><span class="leg-sq" style="background:#378ADD"></span>Penyulaman</span>
+        <span class="leg"><span class="leg-sq" style="background:#639922"></span>Penyiangan</span>
+        <span class="leg"><span class="leg-sq" style="background:#EF9F27"></span>P. Hama</span>
+        <span class="leg"><span class="leg-sq" style="background:#534AB7"></span>Pemupukan</span>
+      </div>
+      <div style="position:relative;height:220px"><canvas id="chartBlok"></canvas></div>
+    </div>
+  </div>
+
+  <div class="sec">Heat Map Aktivitas Mingguan</div>
+  <div class="heatmap-wrap">
+    <div class="hm-title">Aktivitas Pembersihan Jalur per minggu</div>
+    <div class="hm-month-labels" id="hmMonthLabels"></div>
+    <div class="hm-grid" id="hmGrid"></div>
+    <div class="hm-legend">
+      <span>Intensitas:</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#D8D3C5"></div>Belum</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#A8E3CD"></div>1-2 petak</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#1D9E75"></div>3-5 petak</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#1B3A2E"></div>6+ petak</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--ink4)">Kolom=Bulan, Baris=Minggu 1-4</span>
+    </div>
+  </div>
+</div>
+
+<!-- INPUT -->
+<div id="view-input" class="view">
+  <div class="sec">Input Data Mingguan</div>
+  <div class="input-layout">
+    <div class="blok-sidebar">
+      <div class="sidebar-header">
+        <p>Pilih blok</p>
+        <h3 id="sidebarBlokTitle">Blok 1</h3>
+      </div>
+      <div class="blok-list" id="blokList"></div>
+    </div>
+    <div class="form-area">
+      <div class="form-card">
+        <div class="form-card-header">
+          <h4 id="formTitle">Blok 1 - Input Kegiatan</h4>
+          <span id="formTarget">Target: 182 ha</span>
+        </div>
+        <div class="week-select-bar">
+          <label>Bulan</label>
+          <select id="bulanSel"></select>
+          <label style="margin-left:10px">Minggu ke-</label>
+          <select id="weekSel"></select>
+          <div class="friday-info" id="fridayInfo">Jumat: --</div>
+        </div>
+        <div id="lockBanner" class="lock-banner">
+          &#128274; Semua petak sudah 100% terkunci. Pilih minggu lain untuk mengedit.
+        </div>
+        <div style="overflow-x:auto">
+          <table class="petak-table">
+            <thead>
+              <tr>
+                <th>Petak</th>
+                <th>Target (ha)</th>
+                <th>Tgl Jalur</th>
+                <th>Pembersihan Jalur (ha)</th>
+                <th>Tgl Sulam</th>
+                <th>Penyulaman (ha)</th>
+                <th>Tgl Siang</th>
+                <th>Penyiangan &amp; Pendangiran (ha)</th>
+                <th>Tgl Hama</th>
+                <th>P. Hama &amp; Penyakit (ha)</th>
+                <th>Tgl Pupuk</th>
+                <th>Pemupukan (ha)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="petakBody"></tbody>
+          </table>
+        </div>
+        <div class="btn-row">
+          <button class="btn-save" id="btnSave" onclick="saveWeek()">Simpan Minggu Ini</button>
+          <span class="save-msg" id="saveMsg"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REKAP -->
+<div id="view-rekap" class="view">
+  <div class="sec">Rekap Lengkap Semua Blok &amp; Petak</div>
+  <div class="form-card">
+    <div class="rekap-wrap">
+      <table class="rekap-table">
+        <thead>
+          <tr>
+            <th rowspan="2">Blok / Petak</th>
+            <th rowspan="2">Target (ha)</th>
+            <th colspan="2">Pembersihan Jalur</th>
+            <th colspan="2">Penyulaman</th>
+            <th colspan="2">Penyiangan &amp; Pendangiran</th>
+            <th colspan="2">P. Hama &amp; Penyakit</th>
+            <th colspan="2">Pemupukan</th>
+            <th rowspan="2">Status</th>
+          </tr>
+          <tr>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+          </tr>
+        </thead>
+        <tbody id="rekapBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</main>
+
+<!-- MODAL KONFIRMASI EDIT DATA 100% -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-box">
+    <div class="modal-title">&#9999; Edit Data yang Sudah 100%</div>
+    <div class="modal-desc">Petak ini sudah mencapai 100% untuk semua kegiatan. Mengedit data dapat mengubah status capaian yang sudah tercatat.</div>
+    <div class="modal-warning">&#9888; Data yang diubah akan langsung menimpa catatan sebelumnya dan dikirim ulang ke server.</div>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" onclick="closeEditModal()">Batal</button>
+      <button class="modal-btn-confirm" onclick="confirmUnlock()">Ya, Saya Mengerti - Edit Data</button>
+    </div>
+  </div>
+</div>
+
+
+<style>
+:root{
+  --forest:#1B3A2E;--forest2:#234D3C;--forest3:#2D6B50;
+  --teal:#1D9E75;--teal2:#25C491;--teal-lt:#E1F5EE;--teal-mid:#A8E3CD;
+  --amber:#C8762A;--amber-lt:#FDF0DC;
+  --red:#C0392B;--red-lt:#FDEAEA;
+  --blue:#378ADD;--green:#639922;--coral:#D85A30;--purple:#534AB7;
+  --sand:#F5F2EA;--sand2:#EDE9DF;--sand3:#D8D3C5;
+  --ink:#1C1A16;--ink2:#3D3A32;--ink3:#6B6860;--ink4:#9B9890;
+  --white:#FDFCF8;--radius:10px;--radius-lg:16px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.06);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:"DM Sans",sans-serif;background:var(--sand);color:var(--ink);min-height:100vh}
+/* HEADER */
+.app-header{background:var(--forest);padding:0 28px;display:flex;align-items:stretch;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.28)}
+.header-brand{display:flex;align-items:center;gap:12px;padding:12px 0}
+.brand-icon{width:34px;height:34px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-icon svg{width:18px;height:18px;fill:white}
+.brand-text h1{font-family:"Fraunces",serif;font-size:14px;font-weight:600;color:white}
+.brand-text p{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+.header-tabs{display:flex;align-items:stretch;gap:2px}
+.tab-btn{font-family:"DM Sans",sans-serif;font-size:11px;font-weight:500;color:rgba(255,255,255,.5);background:none;border:none;cursor:pointer;padding:0 16px;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.04em;text-transform:uppercase}
+.tab-btn:hover{color:rgba(255,255,255,.85)}
+.tab-btn.active{color:var(--teal2);border-bottom-color:var(--teal2)}
+.header-right{display:flex;align-items:center;gap:8px;padding:12px 0}
+.sync-badge{font-family:"DM Mono",monospace;font-size:10px;padding:4px 10px;border-radius:99px;border:1px solid rgba(29,158,117,.3);background:rgba(29,158,117,.15);color:#25C491}
+.week-badge{font-family:"DM Mono",monospace;font-size:10px;color:var(--teal2);background:rgba(29,158,117,.15);border:1px solid rgba(29,158,117,.3);padding:4px 10px;border-radius:99px}
+/* LAYOUT */
+main{max-width:1280px;margin:0 auto;padding:22px 18px 60px}
+.view{display:none}.view.active{display:block}
+.sec{font-family:"DM Mono",monospace;font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin:26px 0 10px;display:flex;align-items:center;gap:10px}
+.sec::after{content:"";flex:1;height:1px;background:var(--teal-lt)}
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:4px}
+.stat-card{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow-sm)}
+.stat-card.accent{background:var(--forest);border-color:var(--forest)}
+.stat-lbl{font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink4);margin-bottom:3px;line-height:1.3}
+.stat-card.accent .stat-lbl{color:rgba(255,255,255,.5)}
+.stat-val{font-family:"Fraunces",serif;font-size:22px;font-weight:600;color:var(--forest);line-height:1}
+.stat-card.accent .stat-val{color:var(--teal2)}
+.stat-sub{font-size:10px;color:var(--ink4);margin-top:2px}
+.stat-card.accent .stat-sub{color:rgba(255,255,255,.4)}
 /* KEGIATAN FILTER TABS */
 .keg-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .keg-tab{font-family:"DM Mono",monospace;font-size:11px;font-weight:500;padding:5px 12px;
@@ -232,6 +1012,786 @@ main{max-width:1280px;margin:0 auto;padding:22px 18px 60px}
       <div class="stat-lbl">Pemupukan</div>
       <div class="stat-val" id="s-pupuk">0</div>
       <div class="stat-sub">petak selesai</div>
+    </div>
+  </div>
+
+  <div class="sec">Progres Per Blok</div>
+  <div class="prog-section">
+    <div class="prog-header">
+      <strong id="progTitle">Capaian per blok</strong>
+      <div class="keg-tabs" id="kegTabs">
+        <button class="keg-tab active" data-keg="jalur" style="background:#1D9E75;border-color:#1D9E75" onclick="setKegFilter('jalur',this)">Pembersihan Jalur</button>
+        <button class="keg-tab" data-keg="sulam" onclick="setKegFilter('sulam',this)">Penyulaman</button>
+        <button class="keg-tab" data-keg="siang" onclick="setKegFilter('siang',this)">Penyiangan</button>
+        <button class="keg-tab" data-keg="hama" onclick="setKegFilter('hama',this)">P. Hama</button>
+        <button class="keg-tab" data-keg="pupuk" onclick="setKegFilter('pupuk',this)">Pemupukan</button>
+      </div>
+    </div>
+    <div class="blok-grid" id="blokProgGrid"></div>
+  </div>
+
+  <div class="sec">Visualisasi Data</div>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Realisasi kegiatan per minggu</div>
+      <div class="chart-sub">Jumlah petak pembersihan jalur tiap minggu</div>
+      <div style="position:relative;height:200px"><canvas id="chartWeekly"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Komposisi capaian</div>
+      <div class="chart-sub">Status 5 kegiatan seluruh petak</div>
+      <div class="legend">
+        <span class="leg"><span class="leg-sq" style="background:#1D9E75"></span>Selesai semua</span>
+        <span class="leg"><span class="leg-sq" style="background:#C8762A"></span>Sebagian</span>
+        <span class="leg"><span class="leg-sq" style="background:#D8D3C5"></span>Belum</span>
+      </div>
+      <div style="position:relative;height:170px"><canvas id="chartDonut"></canvas></div>
+    </div>
+    <div class="chart-card full">
+      <div class="chart-title">Realisasi luas per kegiatan per blok (ha)</div>
+      <div class="chart-sub">Perbandingan 5 jenis kegiatan antar blok vs target</div>
+      <div class="legend">
+        <span class="leg"><span class="leg-sq" style="background:#1B3A2E"></span>Target</span>
+        <span class="leg"><span class="leg-sq" style="background:#1D9E75"></span>Pembersihan Jalur</span>
+        <span class="leg"><span class="leg-sq" style="background:#378ADD"></span>Penyulaman</span>
+        <span class="leg"><span class="leg-sq" style="background:#639922"></span>Penyiangan</span>
+        <span class="leg"><span class="leg-sq" style="background:#EF9F27"></span>P. Hama</span>
+        <span class="leg"><span class="leg-sq" style="background:#534AB7"></span>Pemupukan</span>
+      </div>
+      <div style="position:relative;height:220px"><canvas id="chartBlok"></canvas></div>
+    </div>
+  </div>
+
+  <div class="sec">Heat Map Aktivitas Mingguan</div>
+  <div class="heatmap-wrap">
+    <div class="hm-title">Aktivitas Pembersihan Jalur per minggu</div>
+    <div class="hm-month-labels" id="hmMonthLabels"></div>
+    <div class="hm-grid" id="hmGrid"></div>
+    <div class="hm-legend">
+      <span>Intensitas:</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#D8D3C5"></div>Belum</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#A8E3CD"></div>1-2 petak</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#1D9E75"></div>3-5 petak</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#1B3A2E"></div>6+ petak</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--ink4)">Kolom=Bulan, Baris=Minggu 1-4</span>
+    </div>
+  </div>
+</div>
+
+<!-- INPUT -->
+<div id="view-input" class="view">
+  <div class="sec">Input Data Mingguan</div>
+  <div class="input-layout">
+    <div class="blok-sidebar">
+      <div class="sidebar-header">
+        <p>Pilih blok</p>
+        <h3 id="sidebarBlokTitle">Blok 1</h3>
+      </div>
+      <div class="blok-list" id="blokList"></div>
+    </div>
+    <div class="form-area">
+      <div class="form-card">
+        <div class="form-card-header">
+          <h4 id="formTitle">Blok 1 - Input Kegiatan</h4>
+          <span id="formTarget">Target: 182 ha</span>
+        </div>
+        <div class="week-select-bar">
+          <label>Bulan</label>
+          <select id="bulanSel"></select>
+          <label style="margin-left:10px">Minggu ke-</label>
+          <select id="weekSel"></select>
+          <div class="friday-info" id="fridayInfo">Jumat: --</div>
+        </div>
+        <div id="lockBanner" class="lock-banner warn">
+          &#9888; Semua kegiatan di blok ini sudah 100%. Klik tombol di bawah untuk mengedit dengan konfirmasi.
+        </div>
+        <div style="overflow-x:auto">
+          <table class="petak-table">
+            <thead>
+              <tr>
+                <th>Petak</th>
+                <th>Target (ha)</th>
+                <th>Tgl Jalur</th>
+                <th>Pembersihan Jalur (ha)</th>
+                <th>Tgl Sulam</th>
+                <th>Penyulaman (ha)</th>
+                <th>Tgl Siang</th>
+                <th>Penyiangan &amp; Pendangiran (ha)</th>
+                <th>Tgl Hama</th>
+                <th>P. Hama &amp; Penyakit (ha)</th>
+                <th>Tgl Pupuk</th>
+                <th>Pemupukan (ha)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="petakBody"></tbody>
+          </table>
+        </div>
+        <div class="btn-row">
+          <button class="btn-save" id="btnSave" onclick="saveWeek()">Simpan Minggu Ini</button>
+          <button class="btn-save" id="btnUnlock" onclick="openEditModal()" style="display:none;background:var(--amber)">&#9999; Edit Data 100%</button>
+          <span class="save-msg" id="saveMsg"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REKAP -->
+<div id="view-rekap" class="view">
+  <div class="sec">Rekap Lengkap Semua Blok &amp; Petak</div>
+  <div class="form-card">
+    <div class="rekap-wrap">
+      <table class="rekap-table">
+        <thead>
+          <tr>
+            <th rowspan="2">Blok / Petak</th>
+            <th rowspan="2">Target (ha)</th>
+            <th colspan="2">Pembersihan Jalur</th>
+            <th colspan="2">Penyulaman</th>
+            <th colspan="2">Penyiangan &amp; Pendangiran</th>
+            <th colspan="2">P. Hama &amp; Penyakit</th>
+            <th colspan="2">Pemupukan</th>
+            <th rowspan="2">Status</th>
+          </tr>
+          <tr>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+          </tr>
+        </thead>
+        <tbody id="rekapBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</main>
+
+
+<style>
+:root{
+  --forest:#1B3A2E;--forest2:#234D3C;--forest3:#2D6B50;
+  --teal:#1D9E75;--teal2:#25C491;--teal-lt:#E1F5EE;--teal-mid:#A8E3CD;
+  --amber:#C8762A;--amber-lt:#FDF0DC;
+  --red:#C0392B;--red-lt:#FDEAEA;
+  --blue:#378ADD;--green:#639922;--coral:#D85A30;--purple:#534AB7;
+  --sand:#F5F2EA;--sand2:#EDE9DF;--sand3:#D8D3C5;
+  --ink:#1C1A16;--ink2:#3D3A32;--ink3:#6B6860;--ink4:#9B9890;
+  --white:#FDFCF8;--radius:10px;--radius-lg:16px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.06);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:"DM Sans",sans-serif;background:var(--sand);color:var(--ink);min-height:100vh}
+/* HEADER */
+.app-header{background:var(--forest);padding:0 28px;display:flex;align-items:stretch;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.28)}
+.header-brand{display:flex;align-items:center;gap:12px;padding:12px 0}
+.brand-icon{width:34px;height:34px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-icon svg{width:18px;height:18px;fill:white}
+.brand-text h1{font-family:"Fraunces",serif;font-size:14px;font-weight:600;color:white}
+.brand-text p{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+.header-tabs{display:flex;align-items:stretch;gap:2px}
+.tab-btn{font-family:"DM Sans",sans-serif;font-size:11px;font-weight:500;color:rgba(255,255,255,.5);background:none;border:none;cursor:pointer;padding:0 16px;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.04em;text-transform:uppercase}
+.tab-btn:hover{color:rgba(255,255,255,.85)}
+.tab-btn.active{color:var(--teal2);border-bottom-color:var(--teal2)}
+.header-right{display:flex;align-items:center;gap:8px;padding:12px 0}
+.sync-badge{font-family:"DM Mono",monospace;font-size:10px;padding:4px 10px;border-radius:99px;border:1px solid rgba(29,158,117,.3);background:rgba(29,158,117,.15);color:#25C491}
+.week-badge{font-family:"DM Mono",monospace;font-size:10px;color:var(--teal2);background:rgba(29,158,117,.15);border:1px solid rgba(29,158,117,.3);padding:4px 10px;border-radius:99px}
+/* LAYOUT */
+main{max-width:1280px;margin:0 auto;padding:22px 18px 60px}
+.view{display:none}.view.active{display:block}
+.sec{font-family:"DM Mono",monospace;font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin:26px 0 10px;display:flex;align-items:center;gap:10px}
+.sec::after{content:"";flex:1;height:1px;background:var(--teal-lt)}
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:4px}
+.stat-card{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow-sm)}
+.stat-card.accent{background:var(--forest);border-color:var(--forest)}
+.stat-lbl{font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink4);margin-bottom:3px;line-height:1.3}
+.stat-card.accent .stat-lbl{color:rgba(255,255,255,.5)}
+.stat-val{font-family:"Fraunces",serif;font-size:22px;font-weight:600;color:var(--forest);line-height:1}
+.stat-card.accent .stat-val{color:var(--teal2)}
+.stat-sub{font-size:10px;color:var(--ink4);margin-top:2px}
+.stat-card.accent .stat-sub{color:rgba(255,255,255,.4)}
+/* PROGRESS */
+.prog-section{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);padding:18px;box-shadow:var(--shadow-sm)}
+.prog-header{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--ink3);margin-bottom:14px}
+.prog-header strong{font-family:"Fraunces",serif;font-size:14px;color:var(--ink);font-weight:600}
+.blok-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px}
+.blok-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.blok-name{font-size:12px;font-weight:600;color:var(--ink);width:50px;flex-shrink:0}
+.blok-track{flex:1;height:8px;background:var(--sand2);border-radius:99px;overflow:hidden}
+.blok-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.blok-pct{font-family:"DM Mono",monospace;font-size:11px;color:var(--ink3);width:34px;text-align:right}
+.blok-detail{font-size:10px;color:var(--ink4);padding-left:60px}
+/* CHARTS */
+.chart-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:12px}
+.chart-card{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow-sm)}
+.chart-card.full{grid-column:1/-1}
+.chart-title{font-family:"Fraunces",serif;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.chart-sub{font-size:11px;color:var(--ink4);margin-bottom:10px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--ink3);margin-bottom:8px}
+.leg{display:flex;align-items:center;gap:4px}
+.leg-sq{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+/* HEATMAP */
+.heatmap-wrap{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow-sm)}
+.hm-title{font-family:"Fraunces",serif;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:10px}
+.hm-month-labels{display:grid;grid-template-columns:repeat(12,1fr);font-size:10px;color:var(--ink4);margin-bottom:4px;font-family:"DM Mono",monospace;text-align:center}
+.hm-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:4px}
+.hm-col{display:flex;flex-direction:column;gap:3px}
+.hm-cell{height:18px;border-radius:3px;cursor:default;transition:transform .15s}
+.hm-cell:hover{transform:scale(1.15);position:relative;z-index:1}
+.hm-legend{display:flex;gap:10px;margin-top:10px;font-size:10px;color:var(--ink4);align-items:center;flex-wrap:wrap}
+.hm-legend-item{display:flex;align-items:center;gap:4px}
+.hm-dot{width:11px;height:11px;border-radius:2px}
+/* INPUT */
+.input-layout{display:grid;grid-template-columns:255px 1fr;gap:14px;align-items:start}
+.blok-sidebar{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);position:sticky;top:68px}
+.sidebar-header{background:var(--forest);padding:12px 14px}
+.sidebar-header p{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.sidebar-header h3{font-family:"Fraunces",serif;font-size:15px;font-weight:600;color:white;margin-top:2px}
+.blok-item{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--sand2);transition:background .15s}
+.blok-item:hover{background:var(--sand)}
+.blok-item.active{background:var(--teal-lt);border-left:3px solid var(--teal)}
+.blok-item-name{font-size:13px;font-weight:600;color:var(--ink)}
+.blok-item-sub{font-size:10px;color:var(--ink4);margin-top:1px}
+.blok-item-pct{font-family:"DM Mono",monospace;font-size:12px;font-weight:500}
+.form-card{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:12px}
+.form-card-header{background:var(--sand);border-bottom:1px solid var(--sand3);padding:11px 16px;display:flex;justify-content:space-between;align-items:center}
+.form-card-header h4{font-size:13px;font-weight:600;color:var(--ink)}
+.form-card-header span{font-size:11px;color:var(--ink4)}
+.week-select-bar{display:flex;gap:8px;align-items:center;padding:10px 16px;background:var(--amber-lt);border-bottom:1px solid #F0DCBA;flex-wrap:wrap}
+.week-select-bar label{font-size:12px;font-weight:500;color:var(--amber)}
+.week-select-bar select{font-family:"DM Mono",monospace;font-size:12px;padding:5px 9px;border:1px solid #D4A96A;border-radius:6px;background:white;color:var(--ink)}
+.friday-info{font-size:11px;color:var(--amber);font-weight:600;padding:4px 10px;background:rgba(200,118,42,.1);border-radius:6px;border:1px solid rgba(200,118,42,.25)}
+/* LOCK */
+.lock-banner{display:none;background:var(--teal-lt);border:1px solid var(--teal-mid);border-radius:8px;padding:9px 14px;margin:10px 16px;font-size:12px;color:#0A6B48;font-weight:500;align-items:center;gap:8px}
+.lock-banner.show{display:flex}
+/* TABLE */
+.petak-table{width:100%;border-collapse:collapse}
+.petak-table th{font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink4);background:var(--sand);padding:8px 7px;text-align:left;border-bottom:1px solid var(--sand3);white-space:nowrap}
+.petak-table td{padding:5px 7px;border-bottom:1px solid var(--sand2);vertical-align:middle}
+.petak-table tr:last-child td{border-bottom:none}
+.petak-table tr:nth-child(even) td{background:rgba(245,242,234,.45)}
+.petak-name{font-size:12px;font-weight:500;color:var(--ink)}
+.done-cell{font-family:"DM Mono",monospace;font-size:10px;color:#0A6B48;background:var(--teal-lt);padding:2px 7px;border-radius:99px}
+.inp{font-family:"DM Mono",monospace;font-size:11px;padding:4px 6px;border:1px solid var(--sand3);border-radius:5px;background:var(--white);color:var(--ink);width:78px;transition:border-color .15s}
+.inp:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 2px rgba(29,158,117,.1)}
+.inp:disabled{background:var(--sand2);color:var(--ink4);cursor:not-allowed;opacity:.7}
+.inp-date{width:122px}
+.inp-sm{width:62px}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+.btn-save{font-family:"DM Sans",sans-serif;font-size:13px;font-weight:600;padding:9px 22px;background:var(--teal);color:white;border:none;border-radius:8px;cursor:pointer;transition:background .15s}
+.btn-save:hover{background:var(--forest3)}
+.btn-save:disabled{background:var(--sand3);cursor:not-allowed}
+.btn-row{padding:12px 16px;display:flex;gap:10px;align-items:center;border-top:1px solid var(--sand2)}
+.save-msg{font-size:12px;color:var(--teal);font-weight:500}
+/* REKAP */
+.rekap-wrap{overflow-x:auto}
+.rekap-table{width:100%;border-collapse:collapse;font-size:11px;min-width:1200px}
+.rekap-table th{font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:white;background:var(--forest);padding:8px 9px;white-space:nowrap}
+.rekap-table th.sub{background:var(--forest2);font-size:8px}
+.rekap-table td{padding:5px 9px;border-bottom:1px solid var(--sand2)}
+.rekap-table tr.blok-row-r td{background:var(--forest);color:white;font-weight:600}
+.rekap-table tr:nth-child(even):not(.blok-row-r) td{background:var(--sand)}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;font-family:"DM Mono",monospace}
+.b-done{background:var(--teal-lt);color:#0A6B48}
+.b-part{background:var(--amber-lt);color:#8A4D0A}
+.b-none{background:var(--sand2);color:var(--ink4)}
+.mono{font-family:"DM Mono",monospace}
+@media(max-width:800px){
+  .stat-grid{grid-template-columns:repeat(3,1fr)}
+  .chart-grid{grid-template-columns:1fr}
+  .chart-card.full{grid-column:1}
+  .input-layout{grid-template-columns:1fr}
+  .blok-sidebar{position:static}
+  .blok-grid{grid-template-columns:1fr}
+  .app-header{padding:0 10px;flex-wrap:wrap}
+  main{padding:12px 10px 48px}
+}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="header-brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20c9 0 10-8 17-13.38A20.56 20.56 0 0117 8z"/><path d="M11.05 11.39c.96-1.79 2.17-3.44 3.47-4.39A14.24 14.24 0 0121 5c-4.17 3.08-5.65 6.95-6.84 9.91A11 11 0 019 16c.37-1.61.95-3.18 2.05-4.61z" opacity=".3"/></svg>
+    </div>
+    <div class="brand-text">
+      <h1>RHL Tracker - KPHP Manubar</h1>
+      <p>PT. Multi Harapan Utama &middot; CV. Langit Alas Kalimantan</p>
+    </div>
+  </div>
+  <div class="header-tabs">
+    <button class="tab-btn active" onclick="switchView('dashboard')">Dashboard</button>
+    <button class="tab-btn" onclick="switchView('input')">Input Mingguan</button>
+    <button class="tab-btn" onclick="switchView('rekap')">Rekap Lengkap</button>
+  </div>
+  <div class="header-right">
+    <div id="syncStatus" class="sync-badge">&#9675; Memuat...</div>
+    <div class="week-badge" id="weekBadge">--</div>
+  </div>
+</header>
+
+<main>
+<!-- DASHBOARD -->
+<div id="view-dashboard" class="view active">
+  <div class="sec">Ringkasan Eksekutif</div>
+  <div class="stat-grid">
+    <div class="stat-card accent">
+      <div class="stat-lbl">Total Target</div>
+      <div class="stat-val">1.407 ha</div>
+      <div class="stat-sub">7 blok &middot; 56 petak</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Pembersihan Jalur</div>
+      <div class="stat-val" id="s-jalur">0</div>
+      <div class="stat-sub">petak selesai</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Penyulaman</div>
+      <div class="stat-val" id="s-sulam">0</div>
+      <div class="stat-sub">petak selesai</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Penyiangan &amp; Pendangiran</div>
+      <div class="stat-val" id="s-siang">0</div>
+      <div class="stat-sub">petak selesai</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">P. Hama &amp; Penyakit</div>
+      <div class="stat-val" id="s-hama">0</div>
+      <div class="stat-sub">petak selesai</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Pemupukan</div>
+      <div class="stat-val" id="s-pupuk">0</div>
+      <div class="stat-sub">petak selesai</div>
+    </div>
+  </div>
+
+  <div class="sec">Progres Per Blok</div>
+  <div class="prog-section">
+    <div class="prog-header">
+      <strong>Capaian per blok (Pembersihan Jalur)</strong>
+      <span>Jalur &middot; Sulam &middot; Siang &middot; Hama &middot; Pupuk</span>
+    </div>
+    <div class="blok-grid" id="blokProgGrid"></div>
+  </div>
+
+  <div class="sec">Visualisasi Data</div>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Realisasi kegiatan per minggu</div>
+      <div class="chart-sub">Jumlah petak pembersihan jalur tiap minggu</div>
+      <div style="position:relative;height:200px"><canvas id="chartWeekly"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Komposisi capaian</div>
+      <div class="chart-sub">Status 5 kegiatan seluruh petak</div>
+      <div class="legend">
+        <span class="leg"><span class="leg-sq" style="background:#1D9E75"></span>Selesai semua</span>
+        <span class="leg"><span class="leg-sq" style="background:#C8762A"></span>Sebagian</span>
+        <span class="leg"><span class="leg-sq" style="background:#D8D3C5"></span>Belum</span>
+      </div>
+      <div style="position:relative;height:170px"><canvas id="chartDonut"></canvas></div>
+    </div>
+    <div class="chart-card full">
+      <div class="chart-title">Realisasi luas per kegiatan per blok (ha)</div>
+      <div class="chart-sub">Perbandingan 5 jenis kegiatan antar blok vs target</div>
+      <div class="legend">
+        <span class="leg"><span class="leg-sq" style="background:#1B3A2E"></span>Target</span>
+        <span class="leg"><span class="leg-sq" style="background:#1D9E75"></span>Pembersihan Jalur</span>
+        <span class="leg"><span class="leg-sq" style="background:#378ADD"></span>Penyulaman</span>
+        <span class="leg"><span class="leg-sq" style="background:#639922"></span>Penyiangan</span>
+        <span class="leg"><span class="leg-sq" style="background:#EF9F27"></span>P. Hama</span>
+        <span class="leg"><span class="leg-sq" style="background:#534AB7"></span>Pemupukan</span>
+      </div>
+      <div style="position:relative;height:220px"><canvas id="chartBlok"></canvas></div>
+    </div>
+  </div>
+
+  <div class="sec">Heat Map Aktivitas Mingguan</div>
+  <div class="heatmap-wrap">
+    <div class="hm-title">Aktivitas Pembersihan Jalur per minggu</div>
+    <div class="hm-month-labels" id="hmMonthLabels"></div>
+    <div class="hm-grid" id="hmGrid"></div>
+    <div class="hm-legend">
+      <span>Intensitas:</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#D8D3C5"></div>Belum</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#A8E3CD"></div>1-2 petak</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#1D9E75"></div>3-5 petak</span>
+      <span class="hm-legend-item"><div class="hm-dot" style="background:#1B3A2E"></div>6+ petak</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--ink4)">Kolom=Bulan, Baris=Minggu 1-4</span>
+    </div>
+  </div>
+</div>
+
+<!-- INPUT -->
+<div id="view-input" class="view">
+  <div class="sec">Input Data Mingguan</div>
+  <div class="input-layout">
+    <div class="blok-sidebar">
+      <div class="sidebar-header">
+        <p>Pilih blok</p>
+        <h3 id="sidebarBlokTitle">Blok 1</h3>
+      </div>
+      <div class="blok-list" id="blokList"></div>
+    </div>
+    <div class="form-area">
+      <div class="form-card">
+        <div class="form-card-header">
+          <h4 id="formTitle">Blok 1 - Input Kegiatan</h4>
+          <span id="formTarget">Target: 182 ha</span>
+        </div>
+        <div class="week-select-bar">
+          <label>Bulan</label>
+          <select id="bulanSel"></select>
+          <label style="margin-left:10px">Minggu ke-</label>
+          <select id="weekSel"></select>
+          <div class="friday-info" id="fridayInfo">Jumat: --</div>
+        </div>
+        <div id="lockBanner" class="lock-banner">
+          &#128274; Semua petak sudah 100% terkunci. Pilih minggu lain untuk mengedit.
+        </div>
+        <div style="overflow-x:auto">
+          <table class="petak-table">
+            <thead>
+              <tr>
+                <th>Petak</th>
+                <th>Target (ha)</th>
+                <th>Tgl Jalur</th>
+                <th>Pembersihan Jalur (ha)</th>
+                <th>Tgl Sulam</th>
+                <th>Penyulaman (ha)</th>
+                <th>Tgl Siang</th>
+                <th>Penyiangan &amp; Pendangiran (ha)</th>
+                <th>Tgl Hama</th>
+                <th>P. Hama &amp; Penyakit (ha)</th>
+                <th>Tgl Pupuk</th>
+                <th>Pemupukan (ha)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="petakBody"></tbody>
+          </table>
+        </div>
+        <div class="btn-row">
+          <button class="btn-save" id="btnSave" onclick="saveWeek()">Simpan Minggu Ini</button>
+          <span class="save-msg" id="saveMsg"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REKAP -->
+<div id="view-rekap" class="view">
+  <div class="sec">Rekap Lengkap Semua Blok &amp; Petak</div>
+  <div class="form-card">
+    <div class="rekap-wrap">
+      <table class="rekap-table">
+        <thead>
+          <tr>
+            <th rowspan="2">Blok / Petak</th>
+            <th rowspan="2">Target (ha)</th>
+            <th colspan="2">Pembersihan Jalur</th>
+            <th colspan="2">Penyulaman</th>
+            <th colspan="2">Penyiangan &amp; Pendangiran</th>
+            <th colspan="2">P. Hama &amp; Penyakit</th>
+            <th colspan="2">Pemupukan</th>
+            <th rowspan="2">Status</th>
+          </tr>
+          <tr>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+            <th class="sub">Tgl</th><th class="sub">Ha</th>
+          </tr>
+        </thead>
+        <tbody id="rekapBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</main>
+
+<!-- MODAL KONFIRMASI EDIT DATA 100% -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-box">
+    <div class="modal-title">&#9999; Edit Data yang Sudah 100%</div>
+    <div class="modal-desc">Petak ini sudah mencapai 100% untuk semua kegiatan. Mengedit data dapat mengubah status capaian yang sudah tercatat.</div>
+    <div class="modal-warning">&#9888; Data yang diubah akan langsung menimpa catatan sebelumnya dan dikirim ulang ke server.</div>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" onclick="closeEditModal()">Batal</button>
+      <button class="modal-btn-confirm" onclick="confirmUnlock()">Ya, Saya Mengerti - Edit Data</button>
+    </div>
+  </div>
+</div>
+
+
+<style>
+:root{
+  --forest:#1B3A2E;--forest2:#234D3C;--forest3:#2D6B50;
+  --teal:#1D9E75;--teal2:#25C491;--teal-lt:#E1F5EE;--teal-mid:#A8E3CD;
+  --amber:#C8762A;--amber-lt:#FDF0DC;
+  --red:#C0392B;--red-lt:#FDEAEA;
+  --blue:#378ADD;--green:#639922;--coral:#D85A30;--purple:#534AB7;
+  --sand:#F5F2EA;--sand2:#EDE9DF;--sand3:#D8D3C5;
+  --ink:#1C1A16;--ink2:#3D3A32;--ink3:#6B6860;--ink4:#9B9890;
+  --white:#FDFCF8;--radius:10px;--radius-lg:16px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.06);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:"DM Sans",sans-serif;background:var(--sand);color:var(--ink);min-height:100vh}
+/* HEADER */
+.app-header{background:var(--forest);padding:0 28px;display:flex;align-items:stretch;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.28)}
+.header-brand{display:flex;align-items:center;gap:12px;padding:12px 0}
+.brand-icon{width:34px;height:34px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-icon svg{width:18px;height:18px;fill:white}
+.brand-text h1{font-family:"Fraunces",serif;font-size:14px;font-weight:600;color:white}
+.brand-text p{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+.header-tabs{display:flex;align-items:stretch;gap:2px}
+.tab-btn{font-family:"DM Sans",sans-serif;font-size:11px;font-weight:500;color:rgba(255,255,255,.5);background:none;border:none;cursor:pointer;padding:0 16px;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.04em;text-transform:uppercase}
+.tab-btn:hover{color:rgba(255,255,255,.85)}
+.tab-btn.active{color:var(--teal2);border-bottom-color:var(--teal2)}
+.header-right{display:flex;align-items:center;gap:8px;padding:12px 0}
+.sync-badge{font-family:"DM Mono",monospace;font-size:10px;padding:4px 10px;border-radius:99px;border:1px solid rgba(29,158,117,.3);background:rgba(29,158,117,.15);color:#25C491}
+.week-badge{font-family:"DM Mono",monospace;font-size:10px;color:var(--teal2);background:rgba(29,158,117,.15);border:1px solid rgba(29,158,117,.3);padding:4px 10px;border-radius:99px}
+/* LAYOUT */
+main{max-width:1280px;margin:0 auto;padding:22px 18px 60px}
+.view{display:none}.view.active{display:block}
+.sec{font-family:"DM Mono",monospace;font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin:26px 0 10px;display:flex;align-items:center;gap:10px}
+.sec::after{content:"";flex:1;height:1px;background:var(--teal-lt)}
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:4px}
+.stat-card{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow-sm)}
+.stat-card.accent{background:var(--forest);border-color:var(--forest)}
+.stat-lbl{font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink4);margin-bottom:3px;line-height:1.3}
+.stat-card.accent .stat-lbl{color:rgba(255,255,255,.5)}
+.stat-val{font-family:"Fraunces",serif;font-size:22px;font-weight:600;color:var(--forest);line-height:1}
+.stat-card.accent .stat-val{color:var(--teal2)}
+.stat-sub{font-size:10px;color:var(--ink4);margin-top:2px}
+.stat-card.accent .stat-sub{color:rgba(255,255,255,.4)}
+/* STATISTIK TABS */
+.stat-period-bar{display:flex;gap:0;margin-bottom:16px;border:1px solid var(--sand3);border-radius:8px;overflow:hidden;width:fit-content}
+.stat-period-btn{font-family:"DM Mono",monospace;font-size:11px;font-weight:500;padding:6px 16px;border:none;background:var(--white);color:var(--ink3);cursor:pointer;transition:all .2s;border-right:1px solid var(--sand3)}
+.stat-period-btn:last-child{border-right:none}
+.stat-period-btn.active{background:var(--forest);color:white}
+.stat-period-btn:hover:not(.active){background:var(--sand2)}
+/* RINGKASAN DETAIL */
+.detail-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.detail-card{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow-sm)}
+.detail-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.detail-card-lbl{font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink4)}
+.detail-card-icon{width:6px;height:6px;border-radius:50%}
+.detail-card-val{font-family:"Fraunces",serif;font-size:20px;font-weight:600;color:var(--forest);line-height:1}
+.detail-card-sub{font-size:10px;color:var(--ink4);margin-top:2px}
+.detail-card-bar{height:3px;border-radius:99px;background:var(--sand2);margin-top:8px;overflow:hidden}
+.detail-card-fill{height:100%;border-radius:99px;transition:width .6s}
+/* TABEL RINGKASAN MINGGUAN */
+.week-summary-table{width:100%;border-collapse:collapse;font-size:11px}
+.week-summary-table th{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:white;background:var(--forest);padding:8px 10px;white-space:nowrap}
+.week-summary-table td{padding:6px 10px;border-bottom:1px solid var(--sand2)}
+.week-summary-table tr:nth-child(even) td{background:var(--sand)}
+.week-summary-table tr:hover td{background:var(--teal-lt)}
+/* KEGIATAN FILTER TABS */
+.keg-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.keg-tab{font-family:"DM Mono",monospace;font-size:11px;font-weight:500;padding:5px 12px;
+  border-radius:99px;border:1.5px solid var(--sand3);background:var(--white);
+  color:var(--ink3);cursor:pointer;transition:all .2s}
+.keg-tab:hover{border-color:var(--teal);color:var(--teal)}
+.keg-tab.active{border-color:transparent;color:white}
+/* LOCK EDIT MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);
+  z-index:200;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--white);border-radius:var(--radius-lg);padding:24px 28px;
+  max-width:420px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.modal-title{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:var(--forest);margin-bottom:8px}
+.modal-desc{font-size:13px;color:var(--ink3);line-height:1.6;margin-bottom:18px}
+.modal-warning{font-size:12px;color:var(--red);background:var(--red-lt);
+  padding:10px 14px;border-radius:8px;margin-bottom:18px;font-weight:500}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end}
+.modal-btn-cancel{font-size:13px;padding:8px 18px;border-radius:7px;
+  border:1px solid var(--sand3);background:var(--sand);color:var(--ink3);cursor:pointer}
+.modal-btn-confirm{font-size:13px;font-weight:600;padding:8px 18px;border-radius:7px;
+  border:none;background:var(--amber);color:white;cursor:pointer}
+.modal-btn-confirm:hover{background:#A05E1A}
+/* LOCK WARNING BANNER */
+.lock-banner{display:none;border-radius:8px;padding:9px 14px;margin:10px 16px;
+  font-size:12px;font-weight:500;align-items:center;gap:8px}
+.lock-banner.show{display:flex}
+.lock-banner.warn{background:var(--amber-lt);border:1px solid #F0DCBA;color:#7A4A0A}
+/* PROGRESS */
+.prog-section{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);padding:18px;box-shadow:var(--shadow-sm)}
+.prog-header{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--ink3);margin-bottom:14px}
+.prog-header strong{font-family:"Fraunces",serif;font-size:14px;color:var(--ink);font-weight:600}
+.blok-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px}
+.blok-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.blok-name{font-size:12px;font-weight:600;color:var(--ink);width:50px;flex-shrink:0}
+.blok-track{flex:1;height:8px;background:var(--sand2);border-radius:99px;overflow:hidden}
+.blok-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.blok-pct{font-family:"DM Mono",monospace;font-size:11px;color:var(--ink3);width:34px;text-align:right}
+.blok-detail{font-size:10px;color:var(--ink4);padding-left:60px}
+/* CHARTS */
+.chart-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:12px}
+.chart-card{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow-sm)}
+.chart-card.full{grid-column:1/-1}
+.chart-title{font-family:"Fraunces",serif;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.chart-sub{font-size:11px;color:var(--ink4);margin-bottom:10px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--ink3);margin-bottom:8px}
+.leg{display:flex;align-items:center;gap:4px}
+.leg-sq{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+/* HEATMAP */
+.heatmap-wrap{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow-sm)}
+.hm-title{font-family:"Fraunces",serif;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:10px}
+.hm-month-labels{display:grid;grid-template-columns:repeat(12,1fr);font-size:10px;color:var(--ink4);margin-bottom:4px;font-family:"DM Mono",monospace;text-align:center}
+.hm-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:4px}
+.hm-col{display:flex;flex-direction:column;gap:3px}
+.hm-cell{height:18px;border-radius:3px;cursor:default;transition:transform .15s}
+.hm-cell:hover{transform:scale(1.15);position:relative;z-index:1}
+.hm-legend{display:flex;gap:10px;margin-top:10px;font-size:10px;color:var(--ink4);align-items:center;flex-wrap:wrap}
+.hm-legend-item{display:flex;align-items:center;gap:4px}
+.hm-dot{width:11px;height:11px;border-radius:2px}
+/* INPUT */
+.input-layout{display:grid;grid-template-columns:255px 1fr;gap:14px;align-items:start}
+.blok-sidebar{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);position:sticky;top:68px}
+.sidebar-header{background:var(--forest);padding:12px 14px}
+.sidebar-header p{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.sidebar-header h3{font-family:"Fraunces",serif;font-size:15px;font-weight:600;color:white;margin-top:2px}
+.blok-item{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--sand2);transition:background .15s}
+.blok-item:hover{background:var(--sand)}
+.blok-item.active{background:var(--teal-lt);border-left:3px solid var(--teal)}
+.blok-item-name{font-size:13px;font-weight:600;color:var(--ink)}
+.blok-item-sub{font-size:10px;color:var(--ink4);margin-top:1px}
+.blok-item-pct{font-family:"DM Mono",monospace;font-size:12px;font-weight:500}
+.form-card{background:var(--white);border:1px solid var(--sand3);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:12px}
+.form-card-header{background:var(--sand);border-bottom:1px solid var(--sand3);padding:11px 16px;display:flex;justify-content:space-between;align-items:center}
+.form-card-header h4{font-size:13px;font-weight:600;color:var(--ink)}
+.form-card-header span{font-size:11px;color:var(--ink4)}
+.week-select-bar{display:flex;gap:8px;align-items:center;padding:10px 16px;background:var(--amber-lt);border-bottom:1px solid #F0DCBA;flex-wrap:wrap}
+.week-select-bar label{font-size:12px;font-weight:500;color:var(--amber)}
+.week-select-bar select{font-family:"DM Mono",monospace;font-size:12px;padding:5px 9px;border:1px solid #D4A96A;border-radius:6px;background:white;color:var(--ink)}
+.friday-info{font-size:11px;color:var(--amber);font-weight:600;padding:4px 10px;background:rgba(200,118,42,.1);border-radius:6px;border:1px solid rgba(200,118,42,.25)}
+/* LOCK */
+.lock-banner{display:none;background:var(--teal-lt);border:1px solid var(--teal-mid);border-radius:8px;padding:9px 14px;margin:10px 16px;font-size:12px;color:#0A6B48;font-weight:500;align-items:center;gap:8px}
+.lock-banner.show{display:flex}
+/* TABLE */
+.petak-table{width:100%;border-collapse:collapse}
+.petak-table th{font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink4);background:var(--sand);padding:8px 7px;text-align:left;border-bottom:1px solid var(--sand3);white-space:nowrap}
+.petak-table td{padding:5px 7px;border-bottom:1px solid var(--sand2);vertical-align:middle}
+.petak-table tr:last-child td{border-bottom:none}
+.petak-table tr:nth-child(even) td{background:rgba(245,242,234,.45)}
+.petak-name{font-size:12px;font-weight:500;color:var(--ink)}
+.done-cell{font-family:"DM Mono",monospace;font-size:10px;color:#0A6B48;background:var(--teal-lt);padding:2px 7px;border-radius:99px}
+.inp{font-family:"DM Mono",monospace;font-size:11px;padding:4px 6px;border:1px solid var(--sand3);border-radius:5px;background:var(--white);color:var(--ink);width:78px;transition:border-color .15s}
+.inp:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 2px rgba(29,158,117,.1)}
+.inp:disabled{background:var(--sand2);color:var(--ink4);cursor:not-allowed;opacity:.7}
+.inp-date{width:122px}
+.inp-sm{width:62px}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+.btn-save{font-family:"DM Sans",sans-serif;font-size:13px;font-weight:600;padding:9px 22px;background:var(--teal);color:white;border:none;border-radius:8px;cursor:pointer;transition:background .15s}
+.btn-save:hover{background:var(--forest3)}
+.btn-save:disabled{background:var(--sand3);cursor:not-allowed}
+.btn-row{padding:12px 16px;display:flex;gap:10px;align-items:center;border-top:1px solid var(--sand2)}
+.save-msg{font-size:12px;color:var(--teal);font-weight:500}
+/* REKAP */
+.rekap-wrap{overflow-x:auto}
+.rekap-table{width:100%;border-collapse:collapse;font-size:11px;min-width:1200px}
+.rekap-table th{font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:white;background:var(--forest);padding:8px 9px;white-space:nowrap}
+.rekap-table th.sub{background:var(--forest2);font-size:8px}
+.rekap-table td{padding:5px 9px;border-bottom:1px solid var(--sand2)}
+.rekap-table tr.blok-row-r td{background:var(--forest);color:white;font-weight:600}
+.rekap-table tr:nth-child(even):not(.blok-row-r) td{background:var(--sand)}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;font-family:"DM Mono",monospace}
+.b-done{background:var(--teal-lt);color:#0A6B48}
+.b-part{background:var(--amber-lt);color:#8A4D0A}
+.b-none{background:var(--sand2);color:var(--ink4)}
+.mono{font-family:"DM Mono",monospace}
+@media(max-width:800px){
+  .stat-grid{grid-template-columns:repeat(3,1fr)}
+  .chart-grid{grid-template-columns:1fr}
+  .chart-card.full{grid-column:1}
+  .input-layout{grid-template-columns:1fr}
+  .blok-sidebar{position:static}
+  .blok-grid{grid-template-columns:1fr}
+  .app-header{padding:0 10px;flex-wrap:wrap}
+  main{padding:12px 10px 48px}
+}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="header-brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20c9 0 10-8 17-13.38A20.56 20.56 0 0117 8z"/><path d="M11.05 11.39c.96-1.79 2.17-3.44 3.47-4.39A14.24 14.24 0 0121 5c-4.17 3.08-5.65 6.95-6.84 9.91A11 11 0 019 16c.37-1.61.95-3.18 2.05-4.61z" opacity=".3"/></svg>
+    </div>
+    <div class="brand-text">
+      <h1>RHL Tracker - KPHP Manubar</h1>
+      <p>PT. Multi Harapan Utama &middot; CV. Langit Alas Kalimantan</p>
+    </div>
+  </div>
+  <div class="header-tabs">
+    <button class="tab-btn active" onclick="switchView('dashboard')">Dashboard</button>
+    <button class="tab-btn" onclick="switchView('input')">Input Mingguan</button>
+    <button class="tab-btn" onclick="switchView('rekap')">Rekap Lengkap</button>
+  </div>
+  <div class="header-right">
+    <div id="syncStatus" class="sync-badge">&#9675; Memuat...</div>
+    <div class="week-badge" id="weekBadge">--</div>
+  </div>
+</header>
+
+<main>
+<!-- DASHBOARD -->
+<div id="view-dashboard" class="view active">
+  <div class="sec">Ringkasan Eksekutif</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+    <div style="font-size:12px;color:var(--ink3)">Filter periode statistik:</div>
+    <div class="stat-period-bar">
+      <button class="stat-period-btn" id="spbMinggu" onclick="setStatPeriod('minggu')">Minggu Ini</button>
+      <button class="stat-period-btn" id="spbBulan" onclick="setStatPeriod('bulan')">Bulan Ini</button>
+      <button class="stat-period-btn active" id="spbTahun" onclick="setStatPeriod('tahun')">Seluruh Tahun</button>
+    </div>
+    <div style="font-size:11px;color:var(--ink4)" id="statPeriodLabel">Semua data</div>
+  </div>
+  <!-- Summary row atas -->
+  <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px">
+    <div class="stat-card accent">
+      <div class="stat-lbl">Total Target</div>
+      <div class="stat-val">1.407 ha</div>
+      <div class="stat-sub">7 blok &middot; 56 petak</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Petak Aktif</div>
+      <div class="stat-val" id="s-aktif">0</div>
+      <div class="stat-sub" id="s-aktif-sub">ada kegiatan</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Petak Selesai Semua</div>
+      <div class="stat-val" id="s-selesai">0</div>
+      <div class="stat-sub">dari 56 petak</div>
+    </div>
+  </div>
+  <!-- Detail 5 kegiatan -->
+  <div class="detail-grid" id="detailGrid"></div>
+  <!-- Tabel ringkasan per minggu/bulan -->
+  <div class="chart-card" style="margin-bottom:14px" id="weekTableWrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div>
+        <div class="chart-title" id="weekTableTitle">Ringkasan per Minggu</div>
+        <div class="chart-sub" id="weekTableSub">Realisasi luas per kegiatan</div>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="week-summary-table" id="weekSummaryTable">
+        <thead id="weekSummaryHead"></thead>
+        <tbody id="weekSummaryBody"></tbody>
+      </table>
     </div>
   </div>
 
@@ -1662,6 +3222,19 @@ async function pushToSheets(petakId,wk,entry){
 function haNum(v){return Math.round(parseFloat(v)||0)}
 function allPetak(){return BLOK_DATA.reduce(function(a,b){return a.concat(b.petak)},[])}
 function getEntry(pid,wk){return ((state.entries[pid]||{})[wk])||{}}
+
+// Ambil data dari minggu sebelumnya (untuk auto-fill)
+function getPrevEntry(pid){
+  const e=state.entries[pid]||{};
+  const keys=Object.keys(e);
+  if(keys.length===0) return {};
+  // Urutkan: bulan*10+minggu desc, ambil yang terbaru
+  keys.sort(function(a,b){
+    const pa=a.split("-").map(Number), pb=b.split("-").map(Number);
+    return (pb[0]*10+pb[1])-(pa[0]*10+pa[1]);
+  });
+  return e[keys[0]]||{};
+}
 function setEntry(pid,wk,data){if(!state.entries[pid])state.entries[pid]={};state.entries[pid][wk]=data;persist();}
 
 function getPetakTotals(pid){
@@ -1833,22 +3406,32 @@ function renderInput(blokId){
     const dis=(petakDone&&!forceEdit)?' disabled="disabled"':"";
     const dotCol=petakDone?"#1D9E75":tot.jalur>0?"#C8762A":"#D8D3C5";
     const nameLbl=p.nama+(petakDone?(' <span class="done-cell" style="'+(forceEdit?'background:#FDF0DC;color:#8A4D0A':'')+'">100%'+(forceEdit?' (edit)':'')+'</span>'):"");
-    // auto-fill tanggal Jumat jika belum ada
-    const tj=e.tglJalur||friStr, ts=e.tglSulam||friStr;
-    const tsi=e.tglSiang||friStr, th=e.tglHama||friStr, tp=e.tglPupuk||friStr;
+    // Auto-fill: minggu ini dulu, kalau kosong ambil dari minggu sebelumnya
+    const prev=Object.keys(e).length===0 ? getPrevEntry(p.id) : {};
+    const isCarryOver=Object.keys(e).length===0 && Object.keys(prev).length>0;
+    // Nilai angka: pakai data minggu ini, atau carry-over dari sebelumnya jika kosong
+    const vJalur = e.jalur||prev.jalur||"";
+    const vSulam = e.sulam||prev.sulam||"";
+    const vSiang = e.siang||prev.siang||"";
+    const vHama  = e.hama ||prev.hama ||"";
+    const vPupuk = e.pupuk||prev.pupuk||"";
+    // Tanggal: selalu Jumat minggu ini
+    const tj=friStr, ts=friStr, tsi=friStr, th=friStr, tp=friStr;
+    // Badge carry-over
+    const carryBadge=isCarryOver?'<span style="font-size:9px;background:#E1F5EE;color:#0A6B48;padding:1px 6px;border-radius:99px;margin-left:4px">auto-isi</span>':"";
     tbody.innerHTML+="<tr>"
-      +'<td><div class="petak-name">'+nameLbl+'</div></td>'
+      +'<td><div class="petak-name">'+nameLbl+carryBadge+'</div></td>'
       +'<td><span class="mono">'+haNum(p.target)+' ha</span></td>'
       +'<td><input class="inp inp-date" type="date" id="tglJ_'+p.id+'" value="'+tj+'"'+dis+'></td>'
-      +'<td><input class="inp inp-sm" type="number" step="0.1" min="0" id="jalur_'+p.id+'" value="'+(e.jalur||"")+'"'+dis+' placeholder="0"></td>'
+      +'<td><input class="inp inp-sm" type="number" step="0.1" min="0" id="jalur_'+p.id+'" value="'+vJalur+'"'+dis+' placeholder="0"></td>'
       +'<td><input class="inp inp-date" type="date" id="tglS_'+p.id+'" value="'+ts+'"'+dis+'></td>'
-      +'<td><input class="inp inp-sm" type="number" step="0.1" min="0" id="sulam_'+p.id+'" value="'+(e.sulam||"")+'"'+dis+' placeholder="0"></td>'
+      +'<td><input class="inp inp-sm" type="number" step="0.1" min="0" id="sulam_'+p.id+'" value="'+vSulam+'"'+dis+' placeholder="0"></td>'
       +'<td><input class="inp inp-date" type="date" id="tglSi_'+p.id+'" value="'+tsi+'"'+dis+'></td>'
-      +'<td><input class="inp inp-sm" type="number" step="0.1" min="0" id="siang_'+p.id+'" value="'+(e.siang||"")+'"'+dis+' placeholder="0"></td>'
+      +'<td><input class="inp inp-sm" type="number" step="0.1" min="0" id="siang_'+p.id+'" value="'+vSiang+'"'+dis+' placeholder="0"></td>'
       +'<td><input class="inp inp-date" type="date" id="tglH_'+p.id+'" value="'+th+'"'+dis+'></td>'
-      +'<td><input class="inp inp-sm" type="number" step="0.1" min="0" id="hama_'+p.id+'" value="'+(e.hama||"")+'"'+dis+' placeholder="0"></td>'
+      +'<td><input class="inp inp-sm" type="number" step="0.1" min="0" id="hama_'+p.id+'" value="'+vHama+'"'+dis+' placeholder="0"></td>'
       +'<td><input class="inp inp-date" type="date" id="tglP_'+p.id+'" value="'+tp+'"'+dis+'></td>'
-      +'<td><input class="inp inp-sm" type="number" step="0.1" min="0" id="pupuk_'+p.id+'" value="'+(e.pupuk||"")+'"'+dis+' placeholder="0"></td>'
+      +'<td><input class="inp inp-sm" type="number" step="0.1" min="0" id="pupuk_'+p.id+'" value="'+vPupuk+'"'+dis+' placeholder="0"></td>'
       +'<td><span class="status-dot" style="background:'+dotCol+'"></span></td>'
       +"</tr>";
   });
@@ -1904,16 +3487,211 @@ async function saveWeek(){
   setTimeout(function(){msg.textContent="";},5000);
 }
 
+// ── STATISTIK PERIODE ────────────────────────────────────────────
+let statPeriod="tahun"; // minggu | bulan | tahun
+
+function setStatPeriod(p){
+  statPeriod=p;
+  ["Minggu","Bulan","Tahun"].forEach(function(x){
+    const btn=document.getElementById("spb"+x);
+    if(btn) btn.className="stat-period-btn"+(p===x.toLowerCase()?" active":"");
+  });
+  renderStatDetail();
+  renderWeekTable();
+}
+
+// Filter weekKeys berdasarkan periode
+function getFilteredWkKeys(){
+  const allWk=new Set();
+  allPetak().forEach(function(p){Object.keys(state.entries[p.id]||{}).forEach(function(w){allWk.add(w)})});
+  if(statPeriod==="tahun") return [...allWk];
+  if(statPeriod==="bulan"){
+    return [...allWk].filter(function(wk){return parseInt(wk.split("-")[0])===selBulan});
+  }
+  // minggu
+  return [...allWk].filter(function(wk){
+    const a=wk.split("-").map(Number);
+    return a[0]===selBulan && a[1]===selMinggu;
+  });
+}
+
+// Hitung luas total kegiatan untuk periode tertentu
+function getKegLuas(keg, wkFilter){
+  const allP=allPetak();
+  let total=0;
+  allP.forEach(function(p){
+    const e=state.entries[p.id]||{};
+    Object.entries(e).forEach(function(kv){
+      if(!wkFilter || wkFilter.indexOf(kv[0])>=0){
+        total+=parseFloat(kv[1][keg]||0);
+      }
+    });
+  });
+  return total;
+}
+
+function renderStatDetail(){
+  const wkKeys=getFilteredWkKeys();
+  const allP=allPetak();
+  const totalTarget=BLOK_DATA.reduce(function(s,b){return s+b.target},0);
+
+  // Label periode
+  const lbl=statPeriod==="minggu"
+    ? wkLabel(selBulan,selMinggu)
+    : statPeriod==="bulan"
+    ? MF[selBulan]+" "+new Date().getFullYear()
+    : "Seluruh Tahun "+new Date().getFullYear();
+  const el=document.getElementById("statPeriodLabel");
+  if(el) el.textContent=lbl;
+
+  // Aktif & selesai
+  const aktif=allP.filter(function(p){
+    const e=state.entries[p.id]||{};
+    return wkKeys.some(function(wk){
+      const d=e[wk]; return d&&Object.values(d).some(function(v){return parseFloat(v)>0});
+    });
+  }).length;
+  const selesai=allP.filter(function(p){return isPetakDone(p.id,p.target)}).length;
+
+  const sAktif=document.getElementById("s-aktif");
+  const sSelesai=document.getElementById("s-selesai");
+  const sAktifSub=document.getElementById("s-aktif-sub");
+  if(sAktif) sAktif.textContent=aktif;
+  if(sSelesai) sSelesai.textContent=selesai;
+  if(sAktifSub) sAktifSub.textContent="dari "+allP.length+" petak";
+
+  // Detail 5 kegiatan
+  const kegs=[
+    {k:"jalur", lbl:"Pembersihan Jalur", col:"#1D9E75"},
+    {k:"sulam", lbl:"Penyulaman",         col:"#378ADD"},
+    {k:"siang", lbl:"Penyiangan",          col:"#639922"},
+    {k:"hama",  lbl:"P. Hama & Penyakit", col:"#EF9F27"},
+    {k:"pupuk", lbl:"Pemupukan",           col:"#534AB7"},
+  ];
+  const grid=document.getElementById("detailGrid");
+  if(!grid) return;
+  grid.innerHTML="";
+  kegs.forEach(function(kg){
+    const luas=getKegLuas(kg.k, wkKeys);
+    const pct=Math.min(Math.round(luas/totalTarget*100),100);
+    const petakAda=allP.filter(function(p){
+      const e=state.entries[p.id]||{};
+      return wkKeys.some(function(wk){return parseFloat((e[wk]||{})[kg.k]||0)>0});
+    }).length;
+    grid.innerHTML+='<div class="detail-card">'
+      +'<div class="detail-card-top">'
+      +'<div class="detail-card-lbl">'+kg.lbl+'</div>'
+      +'<div class="detail-card-icon" style="background:'+kg.col+'"></div>'
+      +'</div>'
+      +'<div class="detail-card-val">'+haNum(luas)+' ha</div>'
+      +'<div class="detail-card-sub">'+petakAda+' petak &bull; '+pct+'% target</div>'
+      +'<div class="detail-card-bar"><div class="detail-card-fill" style="width:'+pct+'%;background:'+kg.col+'"></div></div>'
+      +'</div>';
+  });
+
+  // Update stat cards lama (s-jalur dll) untuk kompatibilitas
+  ["jalur","sulam","siang","hama","pupuk"].forEach(function(k){
+    const el2=document.getElementById("s-"+k);
+    if(el2){
+      el2.textContent=allP.filter(function(p){
+        return wkKeys.some(function(wk){return parseFloat((state.entries[p.id]||{})[wk]||{})[k]>0});
+      }).length;
+    }
+  });
+}
+
+function renderWeekTable(){
+  const thead=document.getElementById("weekSummaryHead");
+  const tbody=document.getElementById("weekSummaryBody");
+  const title=document.getElementById("weekTableTitle");
+  const sub=document.getElementById("weekTableSub");
+  if(!thead||!tbody) return;
+
+  const allP=allPetak();
+  const kegs=["jalur","sulam","siang","hama","pupuk"];
+  const kegLabels=["Pembersihan Jalur","Penyulaman","Penyiangan","P. Hama","Pemupukan"];
+
+  if(statPeriod==="tahun"){
+    // Tabel per bulan
+    if(title) title.textContent="Ringkasan per Bulan";
+    if(sub) sub.textContent="Realisasi luas (ha) per kegiatan per bulan";
+    thead.innerHTML="<tr><th>Bulan</th><th>Jalur (ha)</th><th>Sulam (ha)</th><th>Siang (ha)</th><th>P. Hama (ha)</th><th>Pupuk (ha)</th><th>Total Petak Aktif</th></tr>";
+    tbody.innerHTML="";
+    for(let b=0;b<12;b++){
+      const wkKeys=[];
+      for(let m=1;m<=4;m++) wkKeys.push(wkKey(b,m));
+      const hasData=allP.some(function(p){
+        return wkKeys.some(function(wk){
+          const d=(state.entries[p.id]||{})[wk];
+          return d&&Object.values(d).some(function(v){return parseFloat(v)>0});
+        });
+      });
+      if(!hasData) continue;
+      const vals=kegs.map(function(k){return haNum(getKegLuas(k,wkKeys))});
+      const aktif=allP.filter(function(p){
+        return wkKeys.some(function(wk){
+          const d=(state.entries[p.id]||{})[wk];
+          return d&&Object.values(d).some(function(v){return parseFloat(v)>0});
+        });
+      }).length;
+      tbody.innerHTML+="<tr>"
+        +"<td><strong>"+MF[b]+"</strong></td>"
+        +vals.map(function(v){return "<td class='mono'>"+v+"</td>"}).join("")
+        +"<td class='mono'>"+aktif+" petak</td></tr>";
+    }
+  } else if(statPeriod==="bulan"){
+    // Tabel per minggu dalam bulan ini
+    if(title) title.textContent="Ringkasan per Minggu - "+MF[selBulan];
+    if(sub) sub.textContent="Realisasi luas (ha) per kegiatan per minggu";
+    thead.innerHTML="<tr><th>Minggu</th><th>Tanggal Jumat</th><th>Jalur (ha)</th><th>Sulam (ha)</th><th>Siang (ha)</th><th>P. Hama (ha)</th><th>Pupuk (ha)</th><th>Petak Aktif</th></tr>";
+    tbody.innerHTML="";
+    for(let m=1;m<=4;m++){
+      const wk=wkKey(selBulan,m);
+      const fri=getFriday(selBulan,m);
+      const vals=kegs.map(function(k){return haNum(getKegLuas(k,[wk]))});
+      const aktif=allP.filter(function(p){
+        const d=(state.entries[p.id]||{})[wk];
+        return d&&Object.values(d).some(function(v){return parseFloat(v)>0});
+      }).length;
+      const isActive=(m===selMinggu);
+      tbody.innerHTML+="<tr style='"+(isActive?"font-weight:600;":"")+"'>"
+        +"<td>Minggu ke-"+m+(isActive?' <span style="font-size:9px;background:#1D9E75;color:white;padding:1px 6px;border-radius:99px">aktif</span>':""  )+"</td>"
+        +"<td class='mono' style='color:#666'>"+fmtDateID(fri)+"</td>"
+        +vals.map(function(v){return "<td class='mono'>"+v+"</td>"}).join("")
+        +"<td class='mono'>"+aktif+" petak</td></tr>";
+    }
+  } else {
+    // Tabel per blok untuk minggu ini
+    if(title) title.textContent="Ringkasan per Blok - "+wkLabel(selBulan,selMinggu);
+    if(sub) sub.textContent="Realisasi luas (ha) per kegiatan";
+    thead.innerHTML="<tr><th>Blok</th><th>Target (ha)</th><th>Jalur (ha)</th><th>Sulam (ha)</th><th>Siang (ha)</th><th>P. Hama (ha)</th><th>Pupuk (ha)</th><th>Capaian</th></tr>";
+    tbody.innerHTML="";
+    const wk=wkKey(selBulan,selMinggu);
+    BLOK_DATA.forEach(function(blok){
+      const vals=kegs.map(function(k){
+        return haNum(blok.petak.reduce(function(s,p){
+          return s+parseFloat(((state.entries[p.id]||{})[wk]||{})[k]||0);
+        },0));
+      });
+      const total=vals.reduce(function(a,b){return a+b},0);
+      const pct=total>0?Math.round(total/blok.target/kegs.length*100):0;
+      tbody.innerHTML+="<tr>"
+        +"<td><strong>"+blok.nama+"</strong></td>"
+        +"<td class='mono'>"+haNum(blok.target)+"</td>"
+        +vals.map(function(v){return "<td class='mono'>"+v+"</td>"}).join("")
+        +"<td><span class='badge "+(pct>=100?"b-done":pct>0?"b-part":"b-none")+"'>"+pct+"%</span></td></tr>";
+    });
+  }
+}
+
 var cWeekly,cDonut,cBlok;
 function renderDashboard(){
   const allP=allPetak();
   const weeksUsed=new Set();
   allP.forEach(function(p){Object.keys(state.entries[p.id]||{}).forEach(function(w){weeksUsed.add(w)})});
-  document.getElementById("s-jalur").textContent=allP.filter(function(p){return getPetakTotals(p.id).jalur>0}).length;
-  document.getElementById("s-sulam").textContent=allP.filter(function(p){return getPetakTotals(p.id).sulam>0}).length;
-  document.getElementById("s-siang").textContent=allP.filter(function(p){return getPetakTotals(p.id).siang>0}).length;
-  document.getElementById("s-hama").textContent=allP.filter(function(p){return getPetakTotals(p.id).hama>0}).length;
-  document.getElementById("s-pupuk").textContent=allP.filter(function(p){return getPetakTotals(p.id).pupuk>0}).length;
+  // Render statistik rinci
+  renderStatDetail();
+  renderWeekTable();
 
   const grid=document.getElementById("blokProgGrid");grid.innerHTML="";
   const cols=["#1D9E75","#25C491","#1B8A65","#2D6B50","#0F5A40","#157A55","#1E9E7A"];
