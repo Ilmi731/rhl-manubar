@@ -2144,201 +2144,355 @@ function renderPdfPreview(){
     +"</div>";
 }
 
-// ── EXPORT PDF ───────────────────────────────────────────────────
+// ── EXPORT PDF (Portrait A4) ─────────────────────────────────────
 function exportPDF(){
   var jsPDFClass=(window.jspdf&&window.jspdf.jsPDF)||(window.jsPDF)||(typeof jsPDF!="undefined"?jsPDF:null);
-  if(!jsPDFClass){alert("Library PDF sedang dimuat, tunggu beberapa detik lalu coba lagi.");return;}
+  if(!jsPDFClass){alert("Library PDF sedang dimuat, tunggu beberapa detik.");return;}
   var d=getPdfData();
-  var doc=new jsPDFClass({orientation:"landscape",unit:"mm",format:"a4"});
-  if(typeof doc.autoTable!="function"){alert("Plugin tabel belum siap, tunggu sebentar lalu coba lagi.");return;}
+  var doc=new jsPDFClass({orientation:"portrait",unit:"mm",format:"a4"});
+  if(typeof doc.autoTable!="function"){alert("Plugin tabel belum siap, tunggu sebentar.");return;}
 
-  var W=297,H=210;
-  var cFOREST=[27,58,46],cTEAL=[29,158,117],cSAND=[245,242,234],cSAND2=[237,233,223];
-  var cINK=[28,26,22],cINK3=[107,104,96],cINK4=[155,152,144];
-  var cBLUE=[55,138,221],cGREEN=[99,153,34],cORANGE=[239,159,39],cPURPLE=[83,74,183];
+  var W=210,H=297;
+  // Warna sebagai array RGB
+  var cF=[27,58,46],cT=[29,158,117],cTL=[225,245,238];
+  var cS=[245,242,234],cS2=[237,233,223];
+  var cI=[28,26,22],cI3=[107,104,96],cI4=[155,152,144];
+  var cB=[55,138,221],cG=[99,153,34],cO=[239,159,39],cP=[83,74,183];
 
-  function hdrFooter(){
-    doc.setFillColor.apply(doc,cFOREST);doc.rect(0,0,W,9,"F");
-    doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(255,255,255);
-    doc.text("LAPORAN PEMELIHARAAN RHL  |  KPHP Manubar  |  "+d.periodLabel,14,5.8);
-    doc.text("Hal. "+doc.internal.getNumberOfPages(),W-14,5.8,{align:"right"});
-    doc.setFillColor.apply(doc,cSAND2);doc.rect(0,H-8,W,8,"F");
-    doc.setFontSize(6.5);doc.setFont("helvetica","normal");doc.setTextColor.apply(doc,cINK4);
-    doc.text("PT. Multi Harapan Utama  |  CV. Langit Alas Kalimantan  |  Dibuat: "+new Date().toLocaleDateString("id-ID"),14,H-3);
-    doc.text("Dokumen Resmi - KPHP Manubar",W-14,H-3,{align:"right"});
+  // ── HEADER tiap halaman ────────────────────────────────────────
+  function hdr(){
+    doc.setFillColor(cF[0],cF[1],cF[2]);
+    doc.rect(0,0,W,10,"F");
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(7);doc.setFont("helvetica","bold");
+    doc.text("LAPORAN PEMELIHARAAN RHL  |  KPHP Manubar  |  "+d.periodLabel,12,6.5);
+    doc.text("Hal "+doc.internal.getNumberOfPages(),W-12,6.5,{align:"right"});
+    doc.setFillColor(cS2[0],cS2[1],cS2[2]);
+    doc.rect(0,H-8,W,8,"F");
+    doc.setFontSize(6);doc.setFont("helvetica","normal");doc.setTextColor(cI4[0],cI4[1],cI4[2]);
+    doc.text("PT. Multi Harapan Utama  |  CV. Langit Alas Kalimantan  |  KPHP Manubar",12,H-3);
+    doc.text(new Date().toLocaleDateString("id-ID"),W-12,H-3,{align:"right"});
   }
-  function secTitle(text,y){
-    doc.setFontSize(9.5);doc.setFont("helvetica","bold");doc.setTextColor.apply(doc,cFOREST);
-    doc.text(text,14,y);
-    doc.setFillColor.apply(doc,cTEAL);doc.rect(14,y+1,W-28,0.8,"F");
+
+  // ── SECTION TITLE ─────────────────────────────────────────────
+  function secT(txt,y){
+    doc.setFontSize(9);doc.setFont("helvetica","bold");
+    doc.setTextColor(cF[0],cF[1],cF[2]);
+    doc.text(txt,12,y);
+    doc.setFillColor(cT[0],cT[1],cT[2]);
+    doc.rect(12,y+1,W-24,0.8,"F");
     return y+8;
   }
 
-  // ══ HALAMAN 1: COVER + STATISTIK ══════════════════════════════
-  // Cover
-  doc.setFillColor.apply(doc,cFOREST);doc.rect(0,0,W,54,"F");
-  doc.setFillColor.apply(doc,cTEAL);doc.rect(0,54,W,1.5,"F");
-  // Icon
-  doc.setFillColor.apply(doc,cTEAL);doc.roundedRect(14,10,14,14,2,2,"F");
-  doc.setTextColor(255,255,255);doc.setFontSize(16);doc.setFont("helvetica","bold");doc.text("R",18.5,20.5);
-  // Title
-  doc.setFontSize(6.5);doc.setFont("helvetica","normal");doc.setTextColor(255,255,255);
-  doc.text("LAPORAN KEGIATAN PEMELIHARAAN HUTAN DAN LAHAN (RHL)",32,13);
-  doc.setFontSize(16);doc.setFont("helvetica","bold");doc.text("KPHP Manubar",32,22);
-  doc.setFontSize(10);doc.setFont("helvetica","normal");doc.text("Pemeliharaan Hutan dan Lahan",32,28);
-  doc.setFontSize(8);doc.text("PT. Multi Harapan Utama  |  CV. Langit Alas Kalimantan",32,36);
-  // Meta boxes
-  var metas=[{lbl:"PERIODE",val:d.periodLabel},{lbl:"TGL LAPORAN",val:fmtDateID(d.fri)},{lbl:"TOTAL TARGET",val:d.totalTarget.toLocaleString()+" Ha"},{lbl:"BLOK / PETAK",val:"7 Blok  |  56 Petak"}];
-  var mX=14;
-  metas.forEach(function(m){
-    doc.setFillColor(255,255,255);doc.globalAlpha=0.12;doc.roundedRect(mX,42,65,10,1.5,1.5,"F");doc.globalAlpha=1;
-    doc.setFontSize(5.5);doc.setFont("helvetica","bold");doc.setTextColor(255,255,255);doc.globalAlpha=0.5;
-    doc.text(m.lbl,mX+3,46.5);doc.globalAlpha=1;
-    doc.setFontSize(8.5);doc.setFont("helvetica","bold");doc.text(m.val,mX+3,51);
-    mX+=68;
-  });
+  // ════════════════════════════════════════════════════════════════
+  // HALAMAN 1 — COVER
+  // ════════════════════════════════════════════════════════════════
+  // Cover block
+  doc.setFillColor(cF[0],cF[1],cF[2]);
+  doc.rect(0,0,W,68,"F");
+  doc.setFillColor(cT[0],cT[1],cT[2]);
+  doc.rect(0,68,W,1.5,"F");
 
-  var yy=62;
+  // Ikon R
+  doc.setFillColor(cT[0],cT[1],cT[2]);
+  doc.roundedRect(12,12,18,18,2,2,"F");
+  doc.setTextColor(255,255,255);doc.setFontSize(18);doc.setFont("helvetica","bold");
+  doc.text("R",18,24);
 
-  // Ringkasan 5 kegiatan
-  yy=secTitle("RINGKASAN REALISASI KUMULATIF",yy);
-  var kDefs=[
-    {k:"jalur",lbl:"Pembersihan Jalur",  bg:[225,245,238],tc:cTEAL,  ic:[10,107,72]},
-    {k:"sulam",lbl:"Penyulaman",          bg:[239,246,255],tc:cBLUE,  ic:[29,78,216]},
-    {k:"siang",lbl:"Pendangiran & Siang", bg:[240,253,244],tc:cGREEN, ic:[22,101,52]},
-    {k:"hama", lbl:"P. Hama & Penyakit", bg:[255,251,235],tc:cORANGE,ic:[146,64,14]},
-    {k:"pupuk",lbl:"Pemupukan",           bg:[245,243,255],tc:cPURPLE,ic:[76,29,149]},
+  // Judul
+  doc.setFontSize(7);doc.setFont("helvetica","normal");
+  doc.setTextColor(255,255,255);
+  doc.text("LAPORAN KEGIATAN PEMELIHARAAN HUTAN DAN LAHAN (RHL)",34,15);
+  doc.setFontSize(18);doc.setFont("helvetica","bold");
+  doc.text("KPHP Manubar",34,24);
+  doc.setFontSize(10);doc.setFont("helvetica","normal");
+  doc.text("Pemeliharaan Hutan dan Lahan",34,30);
+
+  // Divider
+  doc.setFillColor(255,255,255);doc.globalAlpha=0.15;
+  doc.rect(12,35,W-24,0.3,"F");doc.globalAlpha=1;
+
+  doc.setFontSize(8.5);doc.setFont("helvetica","normal");
+  doc.setTextColor(255,255,255);
+  doc.text("PT. Multi Harapan Utama  |  CV. Langit Alas Kalimantan",34,40);
+
+  // Meta boxes 2x2
+  var metas=[
+    {lbl:"PERIODE PELAPORAN",val:d.periodLabel},
+    {lbl:"TANGGAL LAPORAN",  val:fmtDateID(d.fri)},
+    {lbl:"TOTAL TARGET",     val:d.totalTarget.toLocaleString()+" Ha"},
+    {lbl:"BLOK / PETAK",     val:"7 Blok  |  56 Petak"},
   ];
-  var cW=53,cX=14;
-  kDefs.forEach(function(s){
-    var val=d.summary[s.k],pct=Math.min(Math.round(val/d.totalTarget*100),100);
-    doc.setFillColor.apply(doc,s.bg);doc.roundedRect(cX,yy,cW,28,2,2,"F");
-    doc.setFillColor.apply(doc,s.tc);doc.roundedRect(cX,yy,cW,2,1,1,"F");
-    doc.setFontSize(6.5);doc.setFont("helvetica","bold");doc.setTextColor.apply(doc,s.ic);
-    doc.text(s.lbl,cX+cW/2,yy+7,{align:"center"});
-    doc.setFontSize(15);doc.text(Math.round(val)+" ha",cX+cW/2,yy+16,{align:"center"});
-    doc.setFontSize(7.5);doc.setFont("helvetica","normal");doc.globalAlpha=0.8;
-    doc.text(pct+"% dari target",cX+cW/2,yy+21.5,{align:"center"});doc.globalAlpha=1;
-    doc.setFillColor(210,210,210);doc.roundedRect(cX+3,yy+23.5,cW-6,2,1,1,"F");
-    doc.setFillColor.apply(doc,s.tc);
-    if(pct>0)doc.roundedRect(cX+3,yy+23.5,(cW-6)*pct/100,2,1,1,"F");
-    cX+=cW+3;
+  var mPositions=[[12,48],[105,48],[12,58],[105,58]];
+  metas.forEach(function(m,i){
+    var mx=mPositions[i][0],my=mPositions[i][1];
+    doc.setFillColor(255,255,255);doc.globalAlpha=0.12;
+    doc.roundedRect(mx,my,90,8,1.5,1.5,"F");doc.globalAlpha=1;
+    doc.setFontSize(5.5);doc.setFont("helvetica","bold");
+    doc.setTextColor(255,255,255);doc.globalAlpha=0.55;
+    doc.text(m.lbl,mx+3,my+3.5);doc.globalAlpha=1;
+    doc.setFontSize(8);doc.setFont("helvetica","bold");
+    doc.setTextColor(255,255,255);
+    doc.text(m.val,mx+3,my+7);
   });
-  yy+=36;
 
-  // Capaian per blok (bar chart)
-  yy=secTitle("CAPAIAN PER BLOK (PEMBERSIHAN JALUR)",yy);
-  var bCols=[cTEAL,cBLUE,cGREEN,cORANGE,cPURPLE,[208,90,48],[200,118,42]];
-  var bW=(W-28-18)/7,bMaxH=30;
+  hdr();
+
+  var yy=76;
+
+  // ════════════════════════════════════════════════════════════════
+  // HALAMAN 1 — 5 KARTU KEGIATAN
+  // ════════════════════════════════════════════════════════════════
+  yy=secT("RINGKASAN REALISASI KUMULATIF",yy);
+  var kDefs=[
+    {k:"jalur",lbl:"Pembersihan Jalur",  bg:[225,245,238],tc:cT, ic:[10,107,72]},
+    {k:"sulam",lbl:"Penyulaman",          bg:[239,246,255],tc:cB, ic:[29,78,216]},
+    {k:"siang",lbl:"Pendangiran & Siang", bg:[240,253,244],tc:cG, ic:[22,101,52]},
+    {k:"hama", lbl:"P. Hama & Penyakit", bg:[255,251,235],tc:cO, ic:[146,64,14]},
+    {k:"pupuk",lbl:"Pemupukan",           bg:[245,243,255],tc:cP, ic:[76,29,149]},
+  ];
+  // 5 kartu: 2 baris (3 atas, 2 bawah)
+  var cW=58,cH=28,cGap=3;
+  var row1=[kDefs[0],kDefs[1],kDefs[2]];
+  var row2=[kDefs[3],kDefs[4]];
+  function drawKegCard(s,cx,cy,cwidth){
+    var val=d.summary[s.k],pct=Math.min(Math.round(val/d.totalTarget*100),100);
+    doc.setFillColor(s.bg[0],s.bg[1],s.bg[2]);
+    doc.roundedRect(cx,cy,cwidth,cH,2,2,"F");
+    doc.setFillColor(s.tc[0],s.tc[1],s.tc[2]);
+    doc.roundedRect(cx,cy,cwidth,2,1,1,"F");
+    doc.setFontSize(6.5);doc.setFont("helvetica","bold");
+    doc.setTextColor(s.ic[0],s.ic[1],s.ic[2]);
+    doc.text(s.lbl,cx+cwidth/2,cy+7,{align:"center"});
+    doc.setFontSize(16);doc.text(Math.round(val)+" ha",cx+cwidth/2,cy+16,{align:"center"});
+    doc.setFontSize(8);doc.setFont("helvetica","normal");doc.globalAlpha=0.8;
+    doc.text(pct+"% dari target",cx+cwidth/2,cy+22,{align:"center"});doc.globalAlpha=1;
+    doc.setFillColor(210,210,210);doc.roundedRect(cx+4,cy+24,cwidth-8,2,1,1,"F");
+    doc.setFillColor(s.tc[0],s.tc[1],s.tc[2]);
+    if(pct>0)doc.roundedRect(cx+4,cy+24,(cwidth-8)*pct/100,2,1,1,"F");
+  }
+  // Baris 1: 3 kartu
+  var r1W=(W-24-cGap*2)/3;
+  row1.forEach(function(s,i){drawKegCard(s,12+i*(r1W+cGap),yy,r1W);});
+  yy+=cH+cGap;
+  // Baris 2: 2 kartu lebih lebar
+  var r2W=(W-24-cGap)/2;
+  row2.forEach(function(s,i){drawKegCard(s,12+i*(r2W+cGap),yy,r2W);});
+  yy+=cH+8;
+
+  // ════════════════════════════════════════════════════════════════
+  // GRAFIK GARIS MINGGUAN — realisasi jalur per bulan-minggu
+  // ════════════════════════════════════════════════════════════════
+  yy=secT("TREN REALISASI MINGGUAN (PEMBERSIHAN JALUR)",yy);
+
+  // Kumpulkan semua weekKey yang ada, urutkan
+  var allWkSet=new Set();
+  allPetak().forEach(function(p){Object.keys(state.entries[p.id]||{}).forEach(function(w){allWkSet.add(w)})});
+  // Tambahkan bulan aktif
+  for(var mi=1;mi<=4;mi++) allWkSet.add(wkKey(d.bulanIdx,mi));
+  var wkList=[...allWkSet].sort(function(a,b){
+    var pa=a.split("-").map(Number),pb=b.split("-").map(Number);
+    return pa[0]!==pb[0]?pa[0]-pb[0]:pa[1]-pb[1];
+  });
+  // Deduplicate
+  wkList=[...new Set(wkList)].slice(-12); // Tampilkan 12 minggu terakhir
+
+  // Hitung nilai per weekKey
+  var wkVals=wkList.map(function(wk){
+    return allPetak().reduce(function(s,p){
+      return s+parseFloat(((state.entries[p.id]||{})[wk]||{}).jalur||0);
+    },0);
+  });
+  var wkLabels=wkList.map(function(wk){
+    var a=wk.split("-").map(Number);
+    return MS[a[0]]+"\nMg"+a[1];
+  });
+
+  // Gambar chart manual
+  var chartX=12,chartY=yy,chartW=W-24,chartH=45;
+  var maxVal=Math.max.apply(null,wkVals.concat([d.totalTarget*0.1]))||1;
+  var rounded=Math.ceil(maxVal/50)*50;
+
+  // Background
+  doc.setFillColor(cS[0],cS[1],cS[2]);
+  doc.roundedRect(chartX,chartY,chartW,chartH,2,2,"F");
+
+  // Grid lines (5 lines)
+  doc.setDrawColor(cI4[0],cI4[1],cI4[2]);doc.setLineWidth(0.2);
+  var padL=12,padR=6,padT=5,padB=14;
+  var gX=chartX+padL,gY=chartY+padT,gW=chartW-padL-padR,gH=chartH-padT-padB;
+  for(var gi=0;gi<=4;gi++){
+    var gy=gY+gH-gi*(gH/4);
+    doc.setLineDashPattern([1,1],0);
+    doc.line(gX,gy,gX+gW,gy);
+    doc.setFontSize(5.5);doc.setFont("helvetica","normal");doc.setTextColor(cI4[0],cI4[1],cI4[2]);
+    doc.text(Math.round(rounded*gi/4)+"",gX-2,gy+1,{align:"right"});
+  }
+  doc.setLineDashPattern([],0);
+
+  // Axis
+  doc.setDrawColor(cI3[0],cI3[1],cI3[2]);doc.setLineWidth(0.4);
+  doc.line(gX,gY,gX,gY+gH);
+  doc.line(gX,gY+gH,gX+gW,gY+gH);
+
+  // Plot lines dan area
+  if(wkList.length>0){
+    var step=gW/(wkList.length>1?wkList.length-1:1);
+    var pts=wkVals.map(function(v,i){
+      return {x:gX+i*step, y:gY+gH-(v/rounded)*gH};
+    });
+
+    // Area fill
+    doc.setFillColor(cT[0],cT[1],cT[2]);doc.globalAlpha=0.12;
+    var pathStr="M "+pts[0].x+" "+(gY+gH);
+    pts.forEach(function(pt){pathStr+=" L "+pt.x+" "+pt.y;});
+    pathStr+=" L "+pts[pts.length-1].x+" "+(gY+gH)+" Z";
+    // jsPDF tidak support path fill langsung, pakai polygon
+    var polyPts=[{x:pts[0].x,y:gY+gH}];
+    pts.forEach(function(pt){polyPts.push({x:pt.x,y:pt.y});});
+    polyPts.push({x:pts[pts.length-1].x,y:gY+gH});
+    doc.polygon(polyPts.map(function(p){return[p.x,p.y];}),"F");
+    doc.globalAlpha=1;
+
+    // Line
+    doc.setDrawColor(cT[0],cT[1],cT[2]);doc.setLineWidth(1.2);
+    for(var li=0;li<pts.length-1;li++){
+      doc.line(pts[li].x,pts[li].y,pts[li+1].x,pts[li+1].y);
+    }
+
+    // Dots & labels
+    pts.forEach(function(pt,i){
+      // Dot
+      doc.setFillColor(cT[0],cT[1],cT[2]);
+      doc.circle(pt.x,pt.y,1.2,"F");
+      doc.setFillColor(255,255,255);
+      doc.circle(pt.x,pt.y,0.5,"F");
+
+      // Value label di atas dot
+      if(wkVals[i]>0){
+        doc.setFontSize(6);doc.setFont("helvetica","bold");
+        doc.setTextColor(cF[0],cF[1],cF[2]);
+        doc.text(Math.round(wkVals[i])+"",pt.x,pt.y-2.5,{align:"center"});
+      }
+
+      // X axis label
+      var lblParts=wkLabels[i].split("\n");
+      doc.setFontSize(5.5);doc.setFont("helvetica","normal");doc.setTextColor(cI3[0],cI3[1],cI3[2]);
+      doc.text(lblParts[0],pt.x,gY+gH+4,{align:"center"});
+      if(lblParts[1])doc.text(lblParts[1],pt.x,gY+gH+7.5,{align:"center"});
+    });
+  }
+  yy+=chartH+8;
+
+  // ════════════════════════════════════════════════════════════════
+  // CAPAIAN PER BLOK (bar horizontal)
+  // ════════════════════════════════════════════════════════════════
+  yy=secT("CAPAIAN PER BLOK",yy);
+  var bCols=[cT,cB,cG,cO,cP,[208,90,48],[200,118,42]];
+  var barRowH=8,barMaxW=W-24-40;
+  var maxBlokVal=Math.max.apply(null,BLOK_DATA.map(function(b){return b.target}))||1;
   BLOK_DATA.forEach(function(blok,i){
-    var bx=14+i*(bW+3);
     var jalurVal=blok.petak.reduce(function(s,p){return s+getPetakTotals(p.id).jalur},0);
     var pct=Math.min(jalurVal/blok.target,1);
-    var fillH=bMaxH*pct;
-    doc.setFillColor.apply(doc,cSAND2);doc.roundedRect(bx,yy,bW,bMaxH,1.5,1.5,"F");
-    if(fillH>0){doc.setFillColor.apply(doc,bCols[i]);doc.roundedRect(bx,yy+bMaxH-fillH,bW,fillH,1,1,"F");}
-    doc.setFontSize(7);doc.setFont("helvetica","bold");
-    if(fillH>6){doc.setTextColor(255,255,255);doc.text(Math.round(pct*100)+"%",bx+bW/2,yy+bMaxH-2,{align:"center"});}
-    doc.setTextColor.apply(doc,cFOREST);
-    doc.text(blok.nama.replace("Blok ",""),bx+bW/2,yy+bMaxH+5,{align:"center"});
-    doc.setFontSize(6.5);doc.setFont("helvetica","normal");doc.setTextColor.apply(doc,cINK3);
-    doc.text(Math.round(jalurVal)+" ha",bx+bW/2,yy+bMaxH+9,{align:"center"});
+    var fillW=barMaxW*pct;
+    var rowY=yy+i*(barRowH+2);
+    // Label blok
+    doc.setFontSize(7.5);doc.setFont("helvetica","bold");doc.setTextColor(cF[0],cF[1],cF[2]);
+    doc.text(blok.nama,12,rowY+barRowH-2);
+    // Bar bg
+    doc.setFillColor(cS2[0],cS2[1],cS2[2]);
+    doc.roundedRect(50,rowY,barMaxW,barRowH,1.5,1.5,"F");
+    // Bar fill
+    if(fillW>0){
+      doc.setFillColor(bCols[i][0],bCols[i][1],bCols[i][2]);
+      doc.roundedRect(50,rowY,fillW,barRowH,1.5,1.5,"F");
+    }
+    // Pct text
+    doc.setFontSize(6.5);doc.setFont("helvetica","bold");
+    if(pct>0.15){
+      doc.setTextColor(255,255,255);
+      doc.text(Math.round(pct*100)+"%  ("+Math.round(jalurVal)+" ha)",53,rowY+barRowH-2);
+    } else {
+      doc.setTextColor(cI3[0],cI3[1],cI3[2]);
+      doc.text(Math.round(pct*100)+"%  ("+Math.round(jalurVal)+" ha)",50+fillW+2,rowY+barRowH-2);
+    }
+    // Target
+    doc.setFontSize(6);doc.setFont("helvetica","normal");doc.setTextColor(cI4[0],cI4[1],cI4[2]);
+    doc.text(Math.round(blok.target)+" ha",W-12,rowY+barRowH-2,{align:"right"});
   });
-  yy+=46;
+  yy+=BLOK_DATA.length*(barRowH+2)+8;
 
-  // Bibit
-  yy=secTitle("KEBUTUHAN BIBIT PENYULAMAN",yy);
+  // ════════════════════════════════════════════════════════════════
+  // BIBIT
+  // ════════════════════════════════════════════════════════════════
+  yy=secT("KEBUTUHAN BIBIT PENYULAMAN",yy);
   var bCards=[
-    {lbl:"Total Bibit",val:d.bibit.toLocaleString()+" btg",sub:"80 btg/ha x "+Math.round(d.summary.sulam)+" ha sulam",bg:cFOREST,tc:[255,255,255]},
-    {lbl:"Kayu-kayuan (45%)",val:d.kayu.toLocaleString()+" btg",sub:"Jenis kayu komersial",bg:[232,245,233],tc:[27,94,32]},
-    {lbl:"MPTS (55%)",val:d.mpts.toLocaleString()+" btg",sub:"Multi Purpose Tree Species",bg:[255,243,224],tc:[191,54,12]},
+    {lbl:"Total Bibit",val:d.bibit.toLocaleString()+" btg",sub:"80 btg/ha x "+Math.round(d.summary.sulam)+" ha",bg:cF,tc:[255,255,255]},
+    {lbl:"Kayu-kayuan 45%",val:d.kayu.toLocaleString()+" btg",sub:"Jenis kayu komersial",bg:[232,245,233],tc:[27,94,32]},
+    {lbl:"MPTS 55%",val:d.mpts.toLocaleString()+" btg",sub:"Multi Purpose Tree Species",bg:[255,243,224],tc:[191,54,12]},
   ];
-  var biX=14;
-  bCards.forEach(function(bc){
-    doc.setFillColor.apply(doc,bc.bg);doc.roundedRect(biX,yy,87,16,2,2,"F");
-    doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor.apply(doc,bc.tc);doc.globalAlpha=0.7;
-    doc.text(bc.lbl,biX+4,yy+5.5);doc.globalAlpha=1;
-    doc.setFontSize(13);doc.text(bc.val,biX+4,yy+12.5);
-    doc.setFontSize(6.5);doc.setFont("helvetica","normal");doc.globalAlpha=0.6;
-    doc.text(bc.sub,biX+4,yy+15.5);doc.globalAlpha=1;
-    biX+=91;
+  var bW3=(W-24-8)/3;
+  bCards.forEach(function(bc,i){
+    var bx=12+i*(bW3+4);
+    doc.setFillColor(bc.bg[0],bc.bg[1],bc.bg[2]);
+    doc.roundedRect(bx,yy,bW3,18,2,2,"F");
+    doc.setFontSize(6.5);doc.setFont("helvetica","bold");
+    doc.setTextColor(bc.tc[0],bc.tc[1],bc.tc[2]);doc.globalAlpha=0.75;
+    doc.text(bc.lbl,bx+bW3/2,yy+5,{align:"center"});doc.globalAlpha=1;
+    doc.setFontSize(13);doc.text(bc.val,bx+bW3/2,yy+12,{align:"center"});
+    doc.setFontSize(6.5);doc.setFont("helvetica","normal");doc.globalAlpha=0.65;
+    doc.text(bc.sub,bx+bW3/2,yy+16.5,{align:"center"});doc.globalAlpha=1;
   });
 
-  hdrFooter();
-
-  // ══ HALAMAN 2+: TABEL DETAIL ═══════════════════════════════════
+  // ════════════════════════════════════════════════════════════════
+  // HALAMAN 2+: TABEL DETAIL
+  // ════════════════════════════════════════════════════════════════
   doc.addPage();
-  var head=[["Blok / Petak","Target (ha)","Tgl Jalur","Jalur (ha)","Tgl Sulam","Sulam (ha)","Tgl Siang","Siang (ha)","Tgl Hama","Hama (ha)","Tgl Pupuk","Pupuk (ha)"]];
+  var head=[["Blok / Petak","Target\n(ha)","Tgl Jalur","Jalur\n(ha)","Tgl Sulam","Sulam\n(ha)","Tgl Siang","Siang\n(ha)","Tgl Hama","Hama\n(ha)","Tgl Pupuk","Pupuk\n(ha)"]];
   var body=[];
   var prevB="";
   d.petakRows.forEach(function(r){
     if(r.blok!==prevB){
       var bTarget=d.blokData.find(function(b){return b.nama===r.blok}).target;
       var bJalur=d.petakRows.filter(function(x){return x.blok===r.blok}).reduce(function(s,x){return s+x.totJalur},0);
-      body.push([{content:r.blok+"   |   Target: "+Math.round(bTarget)+" ha   |   Jalur: "+Math.round(bJalur)+" ha ("+Math.round(bJalur/bTarget*100)+"%)",colSpan:12,styles:{fillColor:cFOREST,textColor:[255,255,255],fontStyle:"bold",fontSize:8}}]);
+      body.push([{
+        content:r.blok+"   |   Target: "+Math.round(bTarget)+" ha   Jalur: "+Math.round(bJalur)+" ha ("+Math.round(bJalur/bTarget*100)+"%)",
+        colSpan:12,
+        styles:{fillColor:cF,textColor:[255,255,255],fontStyle:"bold",fontSize:8}
+      }]);
       prevB=r.blok;
     }
     body.push([
-      r.petak, Math.round(r.target),
-      r.tglJalur, r.jalur>0?Math.round(r.jalur):"",
-      r.tglSulam, r.sulam>0?Math.round(r.sulam):"",
-      r.tglSiang, r.siang>0?Math.round(r.siang):"",
-      r.tglHama,  r.hama>0?Math.round(r.hama):"",
-      r.tglPupuk, r.pupuk>0?Math.round(r.pupuk):"",
+      r.petak,Math.round(r.target),
+      r.tglJalur,r.jalur>0?{content:Math.round(r.jalur),styles:{textColor:r.jalur>=r.target*0.95?[10,107,72]:cI,fontStyle:r.jalur>=r.target*0.95?"bold":"normal"}}:"",
+      r.tglSulam,r.sulam>0?Math.round(r.sulam):"",
+      r.tglSiang,r.siang>0?Math.round(r.siang):"",
+      r.tglHama, r.hama>0?Math.round(r.hama):"",
+      r.tglPupuk,r.pupuk>0?Math.round(r.pupuk):"",
     ]);
   });
 
   doc.autoTable({
     head:head,body:body,
-    startY:12,
-    margin:{left:14,right:14,top:11,bottom:11},
-    styles:{fontSize:8,cellPadding:2.5,font:"helvetica",textColor:cINK,lineWidth:0.1,lineColor:[225,222,215]},
-    headStyles:{fillColor:cFOREST,textColor:[255,255,255],fontStyle:"bold",fontSize:7.5,halign:"center",cellPadding:3},
-    alternateRowStyles:{fillColor:cSAND},
+    startY:13,
+    margin:{left:12,right:12,top:12,bottom:11},
+    styles:{fontSize:7.5,cellPadding:2.2,font:"helvetica",textColor:cI,lineWidth:0.1,lineColor:[225,222,215]},
+    headStyles:{fillColor:cF,textColor:[255,255,255],fontStyle:"bold",fontSize:7,halign:"center",cellPadding:2.5},
+    alternateRowStyles:{fillColor:cS},
     columnStyles:{
-      0:{cellWidth:22},1:{cellWidth:14,halign:"center"},
-      2:{cellWidth:22,fontSize:7,textColor:cINK3},3:{cellWidth:14,halign:"center"},
-      4:{cellWidth:22,fontSize:7,textColor:cINK3},5:{cellWidth:14,halign:"center"},
-      6:{cellWidth:22,fontSize:7,textColor:cINK3},7:{cellWidth:14,halign:"center"},
-      8:{cellWidth:22,fontSize:7,textColor:cINK3},9:{cellWidth:14,halign:"center"},
-      10:{cellWidth:22,fontSize:7,textColor:cINK3},11:{cellWidth:14,halign:"center"},
+      0:{cellWidth:20},1:{cellWidth:12,halign:"center"},
+      2:{cellWidth:18,fontSize:6.5,textColor:cI3},3:{cellWidth:12,halign:"center"},
+      4:{cellWidth:18,fontSize:6.5,textColor:cI3},5:{cellWidth:12,halign:"center"},
+      6:{cellWidth:18,fontSize:6.5,textColor:cI3},7:{cellWidth:12,halign:"center"},
+      8:{cellWidth:18,fontSize:6.5,textColor:cI3},9:{cellWidth:12,halign:"center"},
+      10:{cellWidth:18,fontSize:6.5,textColor:cI3},11:{cellWidth:12,halign:"center"},
     },
-    didDrawPage:function(){hdrFooter();}
-  });
-
-  // ══ HALAMAN TERAKHIR: TANDA TANGAN ═════════════════════════════
-  var finalY=doc.lastAutoTable.finalY+14;
-  if(finalY>H-60){doc.addPage();hdrFooter();finalY=18;}
-  finalY=secTitle("PENGESAHAN LAPORAN",finalY);
-  doc.setFontSize(8);doc.setFont("helvetica","italic");doc.setTextColor.apply(doc,cINK3);
-  doc.text("Dengan ditandatanganinya laporan ini, data realisasi kegiatan pemeliharaan dinyatakan sah dan dapat dipertanggungjawabkan.",14,finalY);
-  finalY+=10;
-  var signs=[
-    {title:"Dibuat oleh",name:"Supervisor Lapangan",org:"CV. Langit Alas Kalimantan"},
-    {title:"Diperiksa oleh",name:"Verifikator Independen",org:"KPHP Manubar"},
-    {title:"Disetujui oleh",name:"Manajer Proyek",org:"PT. Multi Harapan Utama"},
-  ];
-  var sX=14;
-  signs.forEach(function(sg){
-    doc.setFillColor.apply(doc,cSAND);doc.roundedRect(sX,finalY,86,44,2,2,"F");
-    doc.setDrawColor.apply(doc,cTEAL);doc.setLineWidth(0.5);doc.roundedRect(sX,finalY,86,44,2,2,"S");
-    doc.setFillColor.apply(doc,cTEAL);doc.roundedRect(sX,finalY,86,7,2,2,"F");doc.rect(sX,finalY+4,86,3,"F");
-    doc.setFontSize(7.5);doc.setFont("helvetica","bold");doc.setTextColor(255,255,255);
-    doc.text(sg.title,sX+43,finalY+5,{align:"center"});
-    doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor.apply(doc,cINK4);
-    doc.text("Tanggal: ___________________",sX+43,finalY+17,{align:"center"});
-    doc.setDrawColor.apply(doc,cINK3);doc.setLineWidth(0.4);doc.line(sX+10,finalY+33,sX+76,finalY+33);
-    doc.setFontSize(8.5);doc.setFont("helvetica","bold");doc.setTextColor.apply(doc,cFOREST);
-    doc.text(sg.name,sX+43,finalY+38,{align:"center"});
-    doc.setFontSize(7.5);doc.setFont("helvetica","normal");doc.setTextColor.apply(doc,cINK3);
-    doc.text(sg.org,sX+43,finalY+43,{align:"center"});
-    sX+=93;
+    didDrawPage:function(){hdr();}
   });
 
   var fname="Laporan_RHL_KPHP_Manubar_"+MF[d.bulanIdx]+"_Minggu"+d.minggu+"_"+new Date().getFullYear()+".pdf";
   doc.save(fname);
 }
-
 
 </script>
 </body>
